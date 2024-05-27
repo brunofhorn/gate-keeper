@@ -1,4 +1,5 @@
 import Header from "@/layouts/partials/Header";
+import SidebarMenu from "@/layouts/partials/SidebarMenu";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,8 +10,8 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
     return (
         <>
             <Header />
-            <div id="main">
-                <div id="side-menu"></div>
+            <div id="main" className="flex flex-row w-full bg-secondary">
+                <SidebarMenu />
                 <div id="main-content">
                     {children}
                 </div>
