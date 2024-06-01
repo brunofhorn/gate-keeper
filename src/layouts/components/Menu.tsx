@@ -13,7 +13,6 @@ interface IMenu {
 }
 
 const Menu = ({ menu: menus }: IMenuProps) => {
-
     return (
         <>
             {menus.map(((m, i) => (
