@@ -1,6 +1,6 @@
 import Image from "next/image";
 import DynamicIcon from "../helpers/DynamicIcon";
-import { Input } from "@nextui-org/react";
+import { Badge, Input } from "@nextui-org/react";
 import UserMenu from "./UserMenu";
 
 const Header = () => {
@@ -25,7 +25,10 @@ const Header = () => {
                             radius="full"
                         />
                     </div>
-                    <div>
+                    <div className="flex flex-row gap-7 items-center">
+                        <Badge color="danger" content={5} isInvisible={false} shape="circle" size="sm" className="text-xs">
+                            <DynamicIcon icon="FaBell" className="fill-current" fontSize={20} color="#fff" />
+                        </Badge>
                         <UserMenu />
                     </div>
                 </div>
