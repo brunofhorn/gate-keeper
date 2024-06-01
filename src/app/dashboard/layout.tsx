@@ -12,8 +12,13 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
             <Header />
             <div id="main" className="flex flex-row w-full bg-secondary">
                 <SidebarMenu />
-                <div id="main-content">
-                    {children}
+                <div id="main-content" className="w-full">
+                    <div className="px-10">
+                        BREADCRUMB
+                    </div>
+                    <div className="bg-black max-h-full h-full px-10">
+                        {children}
+                    </div>
                 </div>
             </div>
         </>
