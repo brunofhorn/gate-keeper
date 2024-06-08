@@ -16,7 +16,7 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
                     <div className="px-10 py-5 w-full">
                         <h2 className="text-white text-xl font-semibold">Dashboard</h2>
                     </div>
-                    <div className="bg-black h-screen p-10 overflow-y-auto">
+                    <div className="bg-black h-screen p-10 pb-44 overflow-y-auto">
                         {children}
                     </div>
                 </div>
