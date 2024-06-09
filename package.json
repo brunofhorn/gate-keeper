@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.6.0",
     "@nextui-org/button": "^2.0.33",
     "@nextui-org/input": "^2.2.0",
     "@nextui-org/react": "^2.4.1",
@@ -19,8 +20,10 @@
     "react": "^18",
     "react-countup": "^6.5.3",
     "react-dom": "^18",
+    "react-hook-form": "^7.51.5",
     "react-icons": "^5.2.1",
-    "victory": "^37.0.2"
+    "victory": "^37.0.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20",
