@@ -36,7 +36,8 @@ const getIconLibrary = (icon: string): IconMap | undefined => {
         if (letter === letter.toUpperCase() && lib === "" && i > 0) {
             return icon.slice(0, i).toLowerCase();
         }
-        return lib;
+
+        return lib + "";
     }, "");
 
     return iconLibraries[libraryKey];
