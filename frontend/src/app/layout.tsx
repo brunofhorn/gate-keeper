@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import 'react-toastify/dist/ReactToastify.css';
 import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,6 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <link rel="icon" type="image/x-icon" href="/images/logo-icon.png" />
       <body className={`${inter.className} overflow-hidden h-screen max-h-screen`}><Providers>{children}</Providers></body>
     </html>
   );
