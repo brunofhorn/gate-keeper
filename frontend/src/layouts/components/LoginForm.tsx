@@ -10,6 +10,7 @@ import { Button } from "@nextui-org/button";
 import { useRouter } from "next/navigation";
 import { Loading } from "./Loading";
 import { ToastContainer, toast } from "react-toastify";
+import Link from "next/link";
 
 const loginSchema = z.object({
     email: z.string().min(1, { message: "E-mail é obrigatório." }).email({ message: "É necessário informar um e-mail válido." }),
@@ -22,7 +23,7 @@ const LoginForm = () => {
     const { push } = useRouter();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isVisible, setIsVisible] = useState<boolean>(false);
-    const { register, handleSubmit, clearErrors, reset, formState: { errors } } = useForm<LoginFormData>({
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
     });
 
@@ -40,11 +41,6 @@ const LoginForm = () => {
         }
     };
 
-    const resetFields = () => {
-        clearErrors();
-        reset();
-    };
-
     const toggleVisibility = () => {
         setIsVisible(!isVisible);
     };
@@ -52,7 +48,7 @@ const LoginForm = () => {
     return (
         <>
             <ToastContainer position="bottom-center" autoClose={10000} />
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
                 <div>
                     <Input
                         {...register("email")}
@@ -88,23 +84,22 @@ const LoginForm = () => {
                         classNames={{ label: "pb-1" }}
                     />
                 </div>
-                <div>
-                    <Button type={isLoading ? "button" : "submit"} className={`w-full ${isLoading ? "bg-gray-500" : "bg-primary"} text-white p-2 rounded-full hover:bg-tertiary transition-colors duration-300`}>
-                        {isLoading ? (
-                            <>
-                                <Loading />
-                                <span>ENTRANDO</span>
-                            </>
-                        ) : (
-                            <>
-                                <DynamicIcon icon={"FaArrowRightToBracket"} />
-                                <span>
-                                    ENTRAR
-                                </span>
-                            </>
-                        )}
-                    </Button>
-                </div>
+                <Link href="/forgot-password" className="flex justify-end text-xs text-primary hover:text-tertiary text-right">Esqueceu sua senha?</Link>
+                <Button type={isLoading ? "button" : "submit"} className={`w-full ${isLoading ? "bg-gray-500" : "bg-primary"} text-white p-2 rounded-full hover:bg-primaryHover transition-colors duration-300`}>
+                    {isLoading ? (
+                        <>
+                            <Loading />
+                            <span>ENTRANDO</span>
+                        </>
+                    ) : (
+                        <>
+                            <DynamicIcon icon={"FaArrowRightToBracket"} />
+                            <span>
+                                ENTRAR
+                            </span>
+                        </>
+                    )}
+                </Button>
             </form>
         </>
     );
