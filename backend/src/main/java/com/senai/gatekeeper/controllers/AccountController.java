@@ -1,14 +1,14 @@
 package com.senai.gatekeeper.controllers;
 
 import com.senai.gatekeeper.models.Account;
-import com.senai.gatekeeper.service.AccountService;
+import com.senai.gatekeeper.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("/api/accounts")
 public class AccountController {
 
     @Autowired

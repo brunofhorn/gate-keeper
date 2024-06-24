@@ -2,7 +2,7 @@ package com.senai.gatekeeper.controllers;
 
 import com.senai.gatekeeper.dto.LoginDTO;
 import com.senai.gatekeeper.models.Account;
-import com.senai.gatekeeper.service.AuthService;
+import com.senai.gatekeeper.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     @Autowired
     AuthService authService;

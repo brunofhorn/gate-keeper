@@ -1,7 +1,7 @@
-package com.senai.gatekeeper.service;
+package com.senai.gatekeeper.services;
 
 import com.senai.gatekeeper.models.Account;
-import com.senai.gatekeeper.repository.AccountRepository;
+import com.senai.gatekeeper.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;

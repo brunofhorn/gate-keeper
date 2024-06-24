@@ -1,22 +1,23 @@
 package com.senai.gatekeeper.models;
 
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "cameras")
-public class Camera {
+@Document(collection = "areas")
+public class Area {
 
     @Id
     private String id;
 
-    @NotNull(message = "O nome da câmera é obrigatório")
+    private String companyId;
+
     private String name;
 
     private String description;
 
-    private String place;
+    private String deviceIpMacAddress;
 
+    // Getters and Setters
     public String getId() {
         return id;
     }
@@ -25,11 +26,11 @@ public class Camera {
         this.id = id;
     }
 
-    public @NotNull(message = "O nome da câmera é obrigatório") String getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(@NotNull(message = "O nome da câmera é obrigatório") String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -41,12 +42,19 @@ public class Camera {
         this.description = description;
     }
 
-    public String getPlace() {
-        return place;
+    public String getDeviceIpMacAddress() {
+        return deviceIpMacAddress;
     }
 
-    public void setPlace(String place) {
-        this.place = place;
+    public void setDeviceIpMacAddress(String deviceIpMacAddress) {
+        this.deviceIpMacAddress = deviceIpMacAddress;
+    }
+
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
     }
 }
-
