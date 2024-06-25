@@ -1,7 +1,6 @@
-package com.senai.gatekeeper.service;
+package com.senai.gatekeeper.services;
 
 import com.senai.gatekeeper.models.Camera;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 

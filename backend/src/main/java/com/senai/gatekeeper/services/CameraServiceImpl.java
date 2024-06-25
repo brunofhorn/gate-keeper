@@ -1,11 +1,9 @@
-package com.senai.gatekeeper.service;
+package com.senai.gatekeeper.services;
 
 import com.senai.gatekeeper.models.Camera;
-import com.senai.gatekeeper.repository.CameraRepository;
+import com.senai.gatekeeper.repositories.CameraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,7 +34,7 @@ public class CameraServiceImpl implements CameraService {
     public Camera updateCamera(Camera camera) {
         Camera existingCamera = cameraRepository.findById(camera.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Câmera não encontrada com ID: " + camera.getId()));
-        existingCamera.setNome(camera.getNome());
+        existingCamera.setName(camera.getName());
         return cameraRepository.save(existingCamera);
     }
 

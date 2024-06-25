@@ -1,4 +1,4 @@
-package com.senai.gatekeeper.service;
+package com.senai.gatekeeper.services;
 
 import com.senai.gatekeeper.models.Account;
 
