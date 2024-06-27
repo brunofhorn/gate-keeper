@@ -1,8 +1,7 @@
-package com.senai.gatekeeper.services.impl;
+package com.senai.gatekeeper.services;
 
 import com.senai.gatekeeper.models.Area;
 import com.senai.gatekeeper.repositories.AreaRepository;
-import com.senai.gatekeeper.services.AreaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
