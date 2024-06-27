@@ -1,0 +1,12 @@
+runtime: java21
+
+env: flexible
+
+handlers:
+  - url: /.*
+    script: 'this field is required, but ignored'
+
+# automatic_scaling:
+#   cool_down_period: 120s
+#   min_num_instances: 2
+#   max_num_instances: 20
