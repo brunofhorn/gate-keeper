@@ -4,7 +4,13 @@ import { NextResponse } from "next/server";
 
 export const dynamic = 'force-dynamic'; // defaults to auto
 export async function GET(request: Request) {
+    try {
+        const companies = await prisma.company.findMany();
 
+        return NextResponse.json(companies, { status: 200, statusText: "Empresas listadas." });
+    } catch (error) {
+        return NextResponse.json(error, { status: 500, statusText: "Erro ao listar as empresas." });
+    }
 }
 
 export async function POST(request: Request) {
@@ -24,6 +30,6 @@ export async function POST(request: Request) {
             return NextResponse.json(companyExist, { status: 200, statusText: "Empresa já existe." });
         }
     } catch (error) {
-        return NextResponse.json(error, { status: 500, statusText: "Erro ao cadastrar a empresa" });
+        return NextResponse.json(error, { status: 500, statusText: "Erro ao cadastrar a empresa." });
     }
 }

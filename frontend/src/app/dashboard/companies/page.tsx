@@ -1,4 +1,5 @@
 import CompanyForm from "@/layouts/components/CompanyForm";
+import CompanyList from "@/layouts/components/CompanyList";
 import PageTitle from "@/layouts/partials/PageTitle";
 import { Spacer } from "@nextui-org/react";
 
@@ -10,9 +11,9 @@ export default function Companies() {
                 <div>
                     <CompanyForm />
                 </div>
-                <Spacer y={4} />
+                <Spacer y={8} />
                 <div>
-                    {/* <EmployeeList /> */}
+                    <CompanyList />
                 </div>
             </div>
         </>
