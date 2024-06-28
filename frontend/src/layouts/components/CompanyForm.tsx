@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input, Button, Spacer } from '@nextui-org/react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,6 +11,7 @@ import { maskPhone } from '@/service/functions/maskPhone';
 import { toast } from 'react-toastify';
 import { validateCnpj } from '@/service/functions/validateCnpj';
 import { maskNumbers } from '@/service/functions/maskNumbers';
+import { CompanyFormProps } from '@/interfaces/company';
 
 const companySchema = z.object({
     cnpj: z.string().min(1, { message: "O CNPJ é obrigatório." }),
@@ -23,51 +24,115 @@ const companySchema = z.object({
 
 export type CompanyFormData = z.infer<typeof companySchema>;
 
-const CompanyForm = () => {
-    const [registerLoading, setRegisterLoading] = useState<boolean>(false);
+const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }: CompanyFormProps) => {
+    const [loadingForm, setLoadingForm] = useState<boolean>(false);
     const { register, control, handleSubmit, clearErrors, reset, formState: { errors } } = useForm<CompanyFormData>({
         resolver: zodResolver(companySchema),
     });
 
     const onSubmit: SubmitHandler<CompanyFormData> = async (data) => {
-        setRegisterLoading(true);
+        setLoadingForm(true);
 
         try {
-            if (!validateCnpj(data.cnpj)) {
-                toast.error("O CNPJ informado não é válido.");
-            } else {
-                const response = await fetch('/api/company', {
-                    method: 'POST',
+            if (editCompany) {
+                const updatedCompany = { ...editCompany, ...data };
+
+                const response = await fetch(`/api/company/${editCompany.id}`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify({
+                        ...updatedCompany,
+                        telefone: updatedCompany?.telefone?.replace(/\D/g, "").toString()
+                    }),
                 });
 
                 if (response.ok) {
-                    if (response.status === 200) {
-                        toast.warn("O CNPJ informado já está cadastrado.");
-                    } else {
-                        toast.success("A empresa foi cadastrada com sucesso.");
-                        resetFields();
-                    }
+                    toast.success("A empresa foi atualizada com sucesso.");
+                    resetFields();
+
+                    updateCompany(updatedCompany);
+                    setEditCompany(null);
                 } else {
                     toast.error(`Ocorreu um erro ao cadastrar a empresa. ${response.statusText}`);
                 }
-            }
+            } else {
+                if (!validateCnpj(data.cnpj)) {
+                    toast.error("O CNPJ informado não é válido.");
+                    return;
+                } else {
+                    if (data.telefone.length > 0 && data.telefone.length !== 14) {
+                        toast.error("O telefone está incompleto.");
+                        return;
+                    }
 
+                    const response = await fetch('/api/company', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            ...data,
+                            cnpj: data?.cnpj?.replace(/\D/g, "").toString(),
+                            telefone: data?.telefone?.replace(/\D/g, "").toString()
+                        }),
+                    });
+
+                    if (response.ok) {
+                        if (response.status === 200) {
+                            toast.warn("O CNPJ informado já está cadastrado.");
+                        } else {
+                            toast.success("A empresa foi cadastrada com sucesso.");
+                            resetFields();
+
+                            const createdCompany = await response.json();
+                            addCompany(createdCompany);
+                        }
+                    } else {
+                        toast.error(`Ocorreu um erro ao cadastrar a empresa. ${response.statusText}`);
+                    }
+                }
+            }
         } catch (error) {
             toast.error(`Ocorreu um erro ao cadastrar a empresa. Tente novamente.`);
             console.error("Error ", error);
         } finally {
-            setRegisterLoading(false);
+            setLoadingForm(false);
         }
     };
 
     const resetFields = () => {
         clearErrors();
-        reset();
+        reset({
+            cnpj: "",
+            razaoSocial: "",
+            nomeFantasia: "",
+            telefone: "",
+            andar: "",
+            sala: ""
+        });
     };
+
+    const handleCancelEdit = () => {
+        setEditCompany(null);
+        resetFields();
+    };
+
+    useEffect(() => {
+        if (editCompany) {
+            reset({
+                cnpj: editCompany.cnpj,
+                razaoSocial: editCompany.razaoSocial,
+                nomeFantasia: editCompany.nomeFantasia,
+                telefone: editCompany.telefone,
+                andar: editCompany.andar || '',
+                sala: editCompany.sala || ''
+            });
+        } else {
+            reset();
+        }
+    }, [editCompany, reset]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -86,6 +151,7 @@ const CompanyForm = () => {
                                 label="CNPJ"
                                 errorMessage={errors.cnpj?.message?.toString()}
                                 isInvalid={errors.cnpj?.message ? true : false}
+                                isDisabled={!!editCompany}
                             />
                         )}
                     />
@@ -172,15 +238,21 @@ const CompanyForm = () => {
                         <DynamicIcon icon="FaEraser" />
                         Limpar
                     </Button>
-                    {registerLoading ? (
+                    {editCompany && (
+                        <Button type="button" onClick={handleCancelEdit} className='bg-red-900 text-white rounded-full'>
+                            <DynamicIcon icon="FaXmark" />
+                            Cancelar Edição
+                        </Button>
+                    )}
+                    {loadingForm ? (
                         <Button type={"button"} className={`bg-gray-500 text-white rounded-full`}>
                             <DynamicIcon icon="FaSpinner" />
-                            Cadastrando
+                            {editCompany ? 'Editando' : 'Cadastrando'}
                         </Button>
                     ) : (
                         <Button type={"submit"} className={`bg-primary text-white rounded-full`}>
                             <DynamicIcon icon="FaCheck" />
-                            Cadastrar Empresa
+                            {editCompany ? 'Atualizar Empresa' : 'Cadastrar Empresa'}
                         </Button>
                     )}
                 </div>

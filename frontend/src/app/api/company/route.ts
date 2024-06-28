@@ -2,10 +2,15 @@ import { CompanyFormData } from "@/layouts/components/CompanyForm";
 import { prisma } from "@/service/lib/prisma";
 import { NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic'; // defaults to auto
-export async function GET(request: Request) {
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
     try {
-        const companies = await prisma.company.findMany();
+        const companies = await prisma.company.findMany({
+            orderBy: {
+                nomeFantasia: "asc"
+            }
+        });
 
         return NextResponse.json(companies, { status: 200, statusText: "Empresas listadas." });
     } catch (error) {

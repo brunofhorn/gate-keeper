@@ -2,13 +2,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Pagination, Input } from "@nextui-org/react";
 import DynamicIcon from "../helpers/DynamicIcon";
-import { ICompany } from "@/interfaces/company";
+import { CompanyListProps, ICompany } from "@/interfaces/company";
 import { Loading } from "./Loading";
 import { columnsCompany } from "@/config/companyTable";
 
-export default function CompanyList() {
-    const [loadingCompanies, setLoadingCompanies] = useState<boolean>(true);
-
+export default function CompanyList({ loadingCompanies, companies, filteredCompanies, setFilteredCompanies, onEdit, onRemove }: CompanyListProps) {
     const renderCell = useCallback((company: ICompany, columnKey: keyof ICompany | 'actions') => {
         if (columnKey === 'actions') {
             return (
@@ -20,12 +18,16 @@ export default function CompanyList() {
                     </Tooltip>
                     <Tooltip content="Editar Empresa">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <DynamicIcon icon="FaPencil" />
+                            <a onClick={() => onEdit(company)}>
+                                <DynamicIcon icon="FaPencil" />
+                            </a>
                         </span>
                     </Tooltip>
                     <Tooltip color="danger" content="Deletar Empresa">
                         <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                            <DynamicIcon icon="FaTrash" />
+                            <a onClick={() => onRemove(company)}>
+                                <DynamicIcon icon="FaTrash" />
+                            </a>
                         </span>
                     </Tooltip>
                 </div>
@@ -57,7 +59,7 @@ export default function CompanyList() {
             case "andar":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue} / {company.sala}</p>
+                        <p className="text-bold text-sm capitalize">{cellValue} {company?.sala && `/ ${company.sala}`}</p>
                     </div>
                 );
             default:
@@ -65,24 +67,9 @@ export default function CompanyList() {
         }
     }, []);
 
-    const [companies, setCompanies] = useState<ICompany[]>([]);
-    const [filteredCompanies, setFilteredCompanies] = useState<ICompany[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const [itemsPerPage] = useState(5);
     const [search, setSearch] = useState('');
-
-    useEffect(() => {
-        setLoadingCompanies(true);
-
-        const fetchCompanies = async () => {
-            const data: ICompany[] = await fetch('/api/company').then(res => res.json());
-            setCompanies(data);
-            setFilteredCompanies(data);
-            setLoadingCompanies(false);
-        };
-
-        fetchCompanies();
-    }, []);
 
     useEffect(() => {
         setFilteredCompanies(
