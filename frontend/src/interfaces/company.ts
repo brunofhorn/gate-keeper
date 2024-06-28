@@ -22,4 +22,14 @@ export interface CompanyListProps {
     setFilteredCompanies: (companies: ICompany[]) => void;
     onEdit: (company: ICompany) => void;
     onRemove: (company: ICompany) => void;
+    onDetail: (company: ICompany) => void;
+}
+
+export interface ICompanyDetail {
+    cnpj?: string;
+    razaoSocial?: string;
+    nomeFantasia?: string;
+    telefone?: string;
+    andar?: string;
+    sala?: string;
 }

@@ -4,17 +4,20 @@ import { useEffect, useState } from "react";
 import CompanyForm from "@/layouts/components/CompanyForm";
 import CompanyList from "@/layouts/components/CompanyList";
 import PageTitle from "@/layouts/partials/PageTitle";
-import { Spacer } from "@nextui-org/react";
+import { Button, Spacer } from "@nextui-org/react";
 import { ICompany } from "@/interfaces/company";
 import { toast } from "react-toastify";
-import ConfirmationModal from "@/layouts/components/ConfirmationModal";
+import Modal from "@/layouts/components/Modal";
+import { CompanyDetail } from "@/layouts/components/CompanyDetail";
 
 export default function Companies() {
     const [loadingCompanies, setLoadingCompanies] = useState<boolean>(true);
     const [companies, setCompanies] = useState<ICompany[]>([]);
     const [filteredCompanies, setFilteredCompanies] = useState<ICompany[]>([]);
     const [editCompany, setEditCompany] = useState<ICompany | null>(null);
-    const [showModal, setShowModal] = useState<boolean>(false);
+    const [detailCompany, setDetailCompany] = useState<ICompany | null>(null);
+    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+    const [showDetailModal, setShowDetailModal] = useState<boolean>(false);
     const [companyToRemove, setCompanyToRemove] = useState<ICompany | null>(null);
 
     useEffect(() => {
@@ -52,6 +55,11 @@ export default function Companies() {
         setEditCompany(company);
     };
 
+    const handleDetailCompany = (company: ICompany | null) => {
+        setDetailCompany(company);
+        setShowDetailModal(true);
+    };
+
     const confirmRemoveCompany = async () => {
         if (companyToRemove !== null) {
             try {
@@ -59,7 +67,7 @@ export default function Companies() {
                     method: 'DELETE',
                 });
 
-                setShowModal(false);
+                setShowConfirmModal(false);
 
                 if (response.ok) {
                     toast.success("A empresa foi removida com sucesso.");
@@ -80,12 +88,12 @@ export default function Companies() {
 
     const cancelRemoveCompany = () => {
         setCompanyToRemove(null);
-        setShowModal(false);
+        setShowConfirmModal(false);
     };
 
     const handleRemoveCompany = (company: ICompany) => {
         setCompanyToRemove(company);
-        setShowModal(true);
+        setShowConfirmModal(true);
     };
 
     return (
@@ -106,15 +114,37 @@ export default function Companies() {
                     setFilteredCompanies={setFilteredCompanies}
                     onEdit={handleEditCompany}
                     onRemove={handleRemoveCompany}
+                    onDetail={handleDetailCompany}
                 />
             </div>
-            <ConfirmationModal
-                open={showModal}
+            <Modal
+                open={showConfirmModal}
                 title="Confirmar Exclusão"
                 message={<div className="text-center"><p>Tem certeza que deseja excluir a empresa <b>{companyToRemove?.nomeFantasia}</b>?</p><small>Esta ação não poderá ser desfeita.</small></div>}
-                onConfirm={confirmRemoveCompany}
                 onCancel={cancelRemoveCompany}
+                buttons={[
+                    <Button color="primary" onPress={confirmRemoveCompany} key={"confirm_button"}>
+                        Confirmar
+                    </Button>,
+                    <Button color="danger" variant="light" onClick={cancelRemoveCompany} key={"cancel_button"}>
+                        Cancelar
+                    </Button>
+                ]}
             />
+            <Modal
+                open={showDetailModal}
+                title="Detalhes da Empresa"
+                message={<CompanyDetail {...detailCompany} />}
+                size="3xl"
+                onCancel={() => setShowDetailModal(false)}
+                buttons={[
+                    <Button color="danger" variant="light" onClick={() => setShowDetailModal(false)} key={2}>
+                        Fechar
+                    </Button>
+                ]}
+            />
+
+
         </>
     );
 }
