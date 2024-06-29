@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { Loading } from "./Loading";
 import { ToastContainer, toast } from "react-toastify";
 import Link from "next/link";
+import { IUser } from "@/interfaces/user";
+import Cookies from 'js-cookie';
 
 const loginSchema = z.object({
     email: z.string().min(1, { message: "E-mail é obrigatório." }).email({ message: "É necessário informar um e-mail válido." }),
@@ -27,14 +29,36 @@ const LoginForm = () => {
         resolver: zodResolver(loginSchema),
     });
 
-    const onSubmit: SubmitHandler<LoginFormData> = (data) => {
+    const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
         setIsLoading(true);
-        console.log(data);
 
         try {
-            push("/dashboard");
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                toast.success("O login foi feito com sucesso. Entrando...");
+
+                const user: IUser = await response.json();
+                const userData = JSON.stringify(user);
+
+                Cookies.set('gateKeeperUserData', userData, {
+                    path: '/',
+                    expires: 7,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'Strict',
+                });
+
+                push("/dashboard");
+            } else {
+                toast.error(response.statusText);
+            }
         } catch (error) {
-            console.error(error);
             toast.error("Ocorreu um erro ao tentar efetuar o login.");
         } finally {
             setIsLoading(false);
@@ -88,7 +112,7 @@ const LoginForm = () => {
                 <Button type={isLoading ? "button" : "submit"} className={`w-full ${isLoading ? "bg-gray-500" : "bg-primary"} text-white p-2 rounded-full hover:bg-primaryHover transition-colors duration-300`}>
                     {isLoading ? (
                         <>
-                            <Loading />
+                            <Loading size={4} />
                             <span>ENTRANDO</span>
                         </>
                     ) : (

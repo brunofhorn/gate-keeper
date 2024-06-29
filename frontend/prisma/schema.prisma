@@ -16,3 +16,12 @@ model Company {
   andar        String?
   sala         String?
 }
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  username String @unique
+  name     String
+  cpf      String
+  password String
+}

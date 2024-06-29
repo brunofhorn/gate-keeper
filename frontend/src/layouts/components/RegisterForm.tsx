@@ -1,48 +1,83 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, InputProps } from "@nextui-org/input";
-import { DetailedHTMLProps, InputHTMLAttributes, JSX, Ref, useState } from "react";
+import { Input } from "@nextui-org/input";
+import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import { z } from "zod";
 import DynamicIcon from "../helpers/DynamicIcon";
 import { Button } from "@nextui-org/button";
 import { Loading } from "./Loading";
-import { MergeWithAs } from "@nextui-org/system";
 import { maskCpf } from "@/service/functions/maskCpf";
+import { useRouter } from "next/navigation";
+import { validateCpf } from "@/service/functions/validateCpf";
+import { validEmail } from "@/service/functions/validEmail";
 
 const registerSchema = z.object({
-    name: z.string().min(1, { message: "O nome é obrigatório." }),
-    cpf: z.string().min(1, { message: "O CPF é obrigatório." }),
-    email: z.string().min(1, { message: "O e-mail é obrigatório." }).email({ message: "O e-mail está inválido." }),
-    phone: z.string().min(1, { message: 'O telefone é obrigatório' }),
-    password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
-    confirmPassword: z.string().min(6, "A confirmação de senha deve ter no mínimo 6 caracteres."),
+    name: z.string().min(1, { message: "O nome é obrigatório." }).max(70, { message: "O tamanho máximo do nome é 70 caracteres." }),
+    username: z.string().optional(),
+    cpf: z.string().min(1, { message: "O CPF é obrigatório." }).max(14, { message: "O tamanho máximo do CPF é 14 caracteres." }),
+    email: z.string().min(1, { message: "O e-mail é obrigatório." }).email({ message: "O e-mail está inválido." }).max(50, { message: "O tamanho máximo do e-mail é 50 caracteres." }),
+    password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres.").max(20, { message: "O tamanho máximo da senha é de 20 caracteres." }),
+    confirmPassword: z.string().min(6, "A confirmação de senha deve ter no mínimo 6 caracteres.").max(20, { message: "O tamanho máximo da senha é de 20 caracteres." }),
 }).refine((data) => data.password === data.confirmPassword, {
-    message: "As senhas não coincidem",
+    message: "As senhas não coincidem.",
     path: ["confirmPassword"],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 const RegisterForm = () => {
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
     const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState<boolean>(false);
-    const { register, handleSubmit, control, formState: { errors } } = useForm<RegisterFormData>({
+    const { register, handleSubmit, control, watch, formState: { errors } } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
     });
 
-    const onSubmit: SubmitHandler<RegisterFormData> = (data) => {
+    const username = watch("name")?.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s]/gi, '')
+        .replace(/\s+/g, '.');
+
+    const onSubmit: SubmitHandler<RegisterFormData> = async (data) => {
         setIsLoading(true);
-        console.log(data);
 
         try {
-            console.log("TESTE");
+            if (!validateCpf(data.cpf)) {
+                toast.error("O CPF está inválido.");
+                return;
+            }
+
+            if (!validEmail(data.email)) {
+                toast.error("O e-mail está inválido.");
+                return;
+            }
+
+            const response = await fetch('/api/user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...data,
+                    cpf: data?.cpf?.replace(/\D/g, "").toString(),
+                }),
+            });
+
+            if (response.ok) {
+                toast.success("O cadastro foi efetuado com sucesso. Efetue o login.");
+
+                setTimeout(() => {
+                    router.push("/");
+                }, 1000);
+            } else {
+                toast.error(response.statusText);
+            }
         } catch (error) {
             console.error(error);
-            toast.error("Ocorreu um erro ao tentar efetuar o login.");
+            toast.error("Ocorreu um erro ao tentar cadastrar o usuário.");
         } finally {
             setIsLoading(false);
         }
@@ -66,8 +101,10 @@ const RegisterForm = () => {
                         label="Nome completo"
                         placeholder="Digite o seu nome completo"
                         isRequired
+                        size="sm"
+                        maxLength={70}
                         startContent={
-                            <DynamicIcon icon="FaUser" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                            <DynamicIcon icon="FaUser" className="text-lg text-default-400 pointer-events-none flex-shrink-0" />
                         }
                         errorMessage={errors.name?.message?.toString()}
                         isInvalid={errors.name?.message ? true : false}
@@ -75,18 +112,17 @@ const RegisterForm = () => {
                     />
                 </div>
                 <div>
-                    {/* <Input
-                        {...register("cpf")}
-                        label="CPF"
-                        placeholder="Digite o seu CPF"
-                        isRequired
+                    <Input
+                        {...register("username")}
+                        isReadOnly
+                        label="Nome do usuário"
+                        value={username}
+                        size="sm"
                         startContent={
-                            <DynamicIcon icon="FaIdCard" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                            <DynamicIcon icon="FaUser" className="text-lg text-default-400 pointer-events-none flex-shrink-0" />
                         }
-                        errorMessage={errors.cpf?.message?.toString()}
-                        isInvalid={errors.cpf?.message ? true : false}
                         classNames={{ label: "pb-1" }}
-                    /> */}
+                    />
                 </div>
                 <div>
                     <Input
@@ -94,8 +130,10 @@ const RegisterForm = () => {
                         label="E-mail"
                         placeholder="seuemail@empresa.com.br"
                         isRequired
+                        size="sm"
+                        maxLength={50}
                         startContent={
-                            <DynamicIcon icon="FaEnvelope" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                            <DynamicIcon icon="FaEnvelope" className="text-lg text-default-400 pointer-events-none flex-shrink-0" />
                         }
                         errorMessage={errors.email?.message?.toString()}
                         isInvalid={errors.email?.message ? true : false}
@@ -113,7 +151,9 @@ const RegisterForm = () => {
                                 onChange={(e) => onChange(maskCpf(e.target.value))}
                                 placeholder="000.000.000-00"
                                 fullWidth
+                                size="sm"
                                 label="CPF"
+                                maxLength={14}
                                 errorMessage={errors.cpf?.message?.toString()}
                                 isInvalid={errors.cpf?.message ? true : false}
                             />
@@ -127,12 +167,14 @@ const RegisterForm = () => {
                             label="Senha"
                             placeholder="Digite a sua senha"
                             isRequired
+                            size="sm"
+                            maxLength={20}
                             startContent={
-                                <DynamicIcon icon="FaLock" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                                <DynamicIcon icon="FaLock" className="text-lg text-default-400 pointer-events-none flex-shrink-0" />
                             }
                             endContent={
                                 <button className="focus:outline-none" type="button" onClick={() => toggleVisibility('password')}>
-                                    <DynamicIcon icon={isPasswordVisible ? "FaEye" : "FaEyeSlash"} className="text-2xl text-default-400 pointer-events-none" />
+                                    <DynamicIcon icon={isPasswordVisible ? "FaEye" : "FaEyeSlash"} className="text-lg text-default-400 pointer-events-none" />
                                 </button>
                             }
                             type={isPasswordVisible ? "text" : "password"}
@@ -147,12 +189,14 @@ const RegisterForm = () => {
                             label="Confirmar Senha"
                             placeholder="Redigite a senha"
                             isRequired
+                            size="sm"
+                            maxLength={20}
                             startContent={
-                                <DynamicIcon icon="FaLock" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                                <DynamicIcon icon="FaLock" className="text-lg text-default-400 pointer-events-none flex-shrink-0" />
                             }
                             endContent={
                                 <button className="focus:outline-none" type="button" onClick={() => toggleVisibility('confirmPassword')}>
-                                    <DynamicIcon icon={isConfirmPasswordVisible ? "FaEye" : "FaEyeSlash"} className="text-2xl text-default-400 pointer-events-none" />
+                                    <DynamicIcon icon={isConfirmPasswordVisible ? "FaEye" : "FaEyeSlash"} className="text-lg text-default-400 pointer-events-none" />
                                 </button>
                             }
                             type={isConfirmPasswordVisible ? "text" : "password"}
@@ -165,7 +209,7 @@ const RegisterForm = () => {
                 <Button type={isLoading ? "button" : "submit"} className={`w-full ${isLoading ? "bg-gray-500" : "bg-primary"} text-white p-2 rounded-full hover:bg-primaryHover transition-colors duration-300`}>
                     {isLoading ? (
                         <>
-                            <Loading />
+                            <Loading size={4} />
                             <span>CADASTRANDO</span>
                         </>
                     ) : (
