@@ -10,7 +10,7 @@ export default function PublicLayout({ children }: Readonly<{ children: React.Re
         <div className="flex h-screen">
             <div className="hidden lg:flex items-center justify-center flex-1 bg-white text-black">
                 <div className="max-w-md text-center flex flex-col items-center justify-center">
-                    <Image src={`/images${path}.svg`} width={450} height={530} alt="Gate Keeper" />
+                    <Image src={`/images/${path === "/register" ? "register" : "login"}.svg`} width={450} height={530} alt="Gate Keeper" />
                 </div>
             </div>
             <div className="w-full bg-secondary lg:w-1/2 flex items-center justify-center">
