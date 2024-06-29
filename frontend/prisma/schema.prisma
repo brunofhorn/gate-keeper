@@ -8,13 +8,14 @@ datasource db {
 }
 
 model Company {
-  id           String  @id @default(uuid())
-  cnpj         String  @unique
-  razaoSocial  String
-  nomeFantasia String
-  telefone     String
-  andar        String?
-  sala         String?
+  id          String  @id @default(uuid())
+  cnpj        String  @unique
+  companyName String
+  tradeName   String
+  phone       String
+  floor       String?
+  room        String?
+  areas       Area[]
 }
 
 model User {
@@ -24,4 +25,12 @@ model User {
   name     String
   cpf      String
   password String
+}
+
+model Area {
+  id          String  @id @default(uuid())
+  name        String
+  description String
+  company     Company @relation(fields: [companyId], references: [id])
+  companyId   String
 }

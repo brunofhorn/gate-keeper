@@ -1,4 +1,3 @@
-import { CompanyFormData } from "@/layouts/components/CompanyForm";
 import { prisma } from "@/service/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -9,13 +8,7 @@ export async function PUT(request: Request) {
 
     try {
         const updatedCompany = await prisma.company.update({
-            data: {
-                nomeFantasia: data?.nomeFantasia,
-                razaoSocial: data?.razaoSocial,
-                telefone: data?.telefone,
-                andar: data?.andar,
-                sala: data?.sala
-            },
+            data: { ...data },
             where: {
                 id: data.id
             }

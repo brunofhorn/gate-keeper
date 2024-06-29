@@ -1,16 +1,18 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Pagination, Input } from "@nextui-org/react";
-import DynamicIcon from "../helpers/DynamicIcon";
+import DynamicIcon from "../../helpers/DynamicIcon";
 import { CompanyListProps, ICompany } from "@/interfaces/company";
-import { Loading } from "./Loading";
+import { Loading } from "../Loading";
 import { columnsCompany } from "@/config/companyTable";
+import { maskCnpj } from "@/service/functions/maskCnpj";
+import { maskPhone } from "@/service/functions/maskPhone";
 
 export default function CompanyList({ loadingCompanies, companies, filteredCompanies, setFilteredCompanies, onEdit, onRemove, onDetail }: CompanyListProps) {
     const renderCell = useCallback((company: ICompany, columnKey: keyof ICompany | 'actions') => {
         if (columnKey === 'actions') {
             return (
-                <div className="relative flex items-center gap-2">
+                <div className="relative flex justify-center gap-2">
                     <Tooltip content="Detalhes">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                             <a onClick={() => onDetail(company)}>
@@ -39,29 +41,29 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
         const cellValue = company[columnKey];
 
         switch (columnKey) {
-            case "nomeFantasia":
+            case "companyName":
                 return (
                     <div className="flex flex-col">
                         <p className="text-bold text-sm capitalize">{cellValue}</p>
-                        <p className="text-bold text-sm capitalize text-default-400">{company.razaoSocial}</p>
+                        <p className="text-bold text-sm capitalize text-default-400">{company.tradeName}</p>
                     </div>
                 );
             case "cnpj":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue}</p>
+                        <p className="text-bold text-sm capitalize">{maskCnpj(cellValue)}</p>
                     </div>
                 );
-            case "telefone":
+            case "phone":
                 return (
                     <>
-                        {cellValue}
+                        {maskPhone(cellValue)}
                     </>
                 );
-            case "andar":
+            case "floor":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue} {company?.sala && `/ ${company.sala}`}</p>
+                        <p className="text-bold text-sm capitalize">{cellValue} {company?.floor && `/ ${company.room}`}</p>
                     </div>
                 );
             default:
@@ -76,7 +78,7 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
     useEffect(() => {
         setFilteredCompanies(
             companies.filter(company =>
-                company.nomeFantasia.toLowerCase().includes(search.toLowerCase())
+                company.tradeName.toLowerCase().includes(search.toLowerCase())
             )
         );
         setCurrentPage(1);

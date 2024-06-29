@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CompanyForm from "@/layouts/components/CompanyForm";
-import CompanyList from "@/layouts/components/CompanyList";
+import CompanyForm from "@/layouts/components/company/CompanyForm";
+import CompanyList from "@/layouts/components/company/CompanyList";
 import PageTitle from "@/layouts/partials/PageTitle";
 import { Button, Spacer } from "@nextui-org/react";
 import { ICompany } from "@/interfaces/company";
 import { toast } from "react-toastify";
 import Modal from "@/layouts/components/Modal";
-import { CompanyDetail } from "@/layouts/components/CompanyDetail";
+import { CompanyDetail } from "@/layouts/components/company/CompanyDetail";
 
 export default function Companies() {
     const [loadingCompanies, setLoadingCompanies] = useState<boolean>(true);
@@ -35,7 +35,7 @@ export default function Companies() {
 
     const addCompany = (newCompany: ICompany) => {
         const updatedCompanies = [...companies, newCompany].sort((a, b) =>
-            a.nomeFantasia.localeCompare(b.nomeFantasia)
+            a.tradeName.localeCompare(b.tradeName)
         );
 
         setCompanies(updatedCompanies);
@@ -43,9 +43,9 @@ export default function Companies() {
     };
 
     const updateCompany = (updatedCompany: ICompany) => {
-        const updatedCompanies = companies.map((empresa) =>
-            empresa.id === updatedCompany.id ? updatedCompany : empresa
-        ).sort((a, b) => a.nomeFantasia.localeCompare(b.nomeFantasia));
+        const updatedCompanies = companies.map((company) =>
+            company.id === updatedCompany.id ? updatedCompany : company
+        ).sort((a, b) => a.tradeName.localeCompare(b.tradeName));
 
         setCompanies(updatedCompanies);
         setFilteredCompanies(updatedCompanies);
@@ -120,7 +120,7 @@ export default function Companies() {
             <Modal
                 open={showConfirmModal}
                 title="Confirmar Exclusão"
-                message={<div className="text-center"><p>Tem certeza que deseja excluir a empresa <b>{companyToRemove?.nomeFantasia}</b>?</p><small>Esta ação não poderá ser desfeita.</small></div>}
+                message={<div className="text-center"><p>Tem certeza que deseja excluir a empresa <b>{companyToRemove?.tradeName}</b>?</p><small>Esta ação não poderá ser desfeita.</small></div>}
                 onCancel={cancelRemoveCompany}
                 buttons={[
                     <Button color="primary" onPress={confirmRemoveCompany} key={"confirm_button"}>

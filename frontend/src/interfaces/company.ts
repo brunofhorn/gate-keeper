@@ -1,11 +1,11 @@
 export interface ICompany {
     id: string;
     cnpj: string;
-    razaoSocial: string;
-    nomeFantasia: string;
-    telefone: string;
-    andar: string;
-    sala: string;
+    companyName: string;
+    tradeName: string;
+    phone: string;
+    floor: string;
+    room: string;
 }
 
 export interface CompanyFormProps {
@@ -27,9 +27,9 @@ export interface CompanyListProps {
 
 export interface ICompanyDetail {
     cnpj?: string;
-    razaoSocial?: string;
-    nomeFantasia?: string;
-    telefone?: string;
-    andar?: string;
-    sala?: string;
+    companyName?: string;
+    tradeName?: string;
+    phone?: string;
+    floor?: string;
+    room?: string;
 }

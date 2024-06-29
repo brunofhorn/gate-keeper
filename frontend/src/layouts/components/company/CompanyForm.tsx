@@ -5,21 +5,22 @@ import { Input, Button, Spacer } from '@nextui-org/react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import DynamicIcon from '../helpers/DynamicIcon';
+import DynamicIcon from '../../helpers/DynamicIcon';
 import { maskCnpj } from '@/service/functions/maskCnpj';
 import { maskPhone } from '@/service/functions/maskPhone';
 import { toast } from 'react-toastify';
 import { validateCnpj } from '@/service/functions/validateCnpj';
 import { maskNumbers } from '@/service/functions/maskNumbers';
 import { CompanyFormProps } from '@/interfaces/company';
+import { Loading } from '../Loading';
 
 const companySchema = z.object({
     cnpj: z.string().min(1, { message: "O CNPJ é obrigatório." }),
-    razaoSocial: z.string().min(1, { message: "A razão social é obrigatória" }).max(60, { message: "O limite máximo de caracteres é 60." }),
-    nomeFantasia: z.string().min(1, { message: "Nome é obrigatório" }).max(70, { message: "O limite máximo de caracteres é 70." }),
-    telefone: z.string().min(1, { message: "O telefone é obrigatório." }).max(14, { message: "O limite máximo de caracteres é 11." }),
-    andar: z.string().max(3, { message: "O limite máximo de caracteres é 3." }).optional(),
-    sala: z.string().max(6, { message: "O limite máximo de caracteres é 6" }).optional()
+    companyName: z.string().min(1, { message: "A razão social é obrigatória." }).max(60, { message: "O limite máximo de caracteres é 60." }),
+    tradeName: z.string().min(1, { message: "Nome é obrigatório." }).max(70, { message: "O limite máximo de caracteres é 70." }),
+    phone: z.string().min(1, { message: "O telefone é obrigatório." }).max(14, { message: "O limite máximo de caracteres é 11." }),
+    floor: z.string().max(3, { message: "O limite máximo de caracteres é 3." }).optional(),
+    room: z.string().max(6, { message: "O limite máximo de caracteres é 6." }).optional()
 });
 
 export type CompanyFormData = z.infer<typeof companySchema>;
@@ -44,7 +45,7 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                     },
                     body: JSON.stringify({
                         ...updatedCompany,
-                        telefone: updatedCompany?.telefone?.replace(/\D/g, "").toString()
+                        phone: updatedCompany?.phone?.replace(/\D/g, "").toString()
                     }),
                 });
 
@@ -62,7 +63,7 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                     toast.error("O CNPJ informado não é válido.");
                     return;
                 } else {
-                    if (data.telefone.length > 0 && data.telefone.length !== 14) {
+                    if (data.phone.length > 0 && data.phone.length !== 14) {
                         toast.error("O telefone está incompleto.");
                         return;
                     }
@@ -75,7 +76,7 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                         body: JSON.stringify({
                             ...data,
                             cnpj: data?.cnpj?.replace(/\D/g, "").toString(),
-                            telefone: data?.telefone?.replace(/\D/g, "").toString()
+                            phone: data?.phone?.replace(/\D/g, "").toString()
                         }),
                     });
 
@@ -106,11 +107,11 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
         clearErrors();
         reset({
             cnpj: "",
-            razaoSocial: "",
-            nomeFantasia: "",
-            telefone: "",
-            andar: "",
-            sala: ""
+            companyName: "",
+            tradeName: "",
+            phone: "",
+            floor: "",
+            room: ""
         });
     };
 
@@ -123,11 +124,11 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
         if (editCompany) {
             reset({
                 cnpj: editCompany.cnpj,
-                razaoSocial: editCompany.razaoSocial,
-                nomeFantasia: editCompany.nomeFantasia,
-                telefone: editCompany.telefone,
-                andar: editCompany.andar || '',
-                sala: editCompany.sala || ''
+                companyName: editCompany.companyName,
+                tradeName: editCompany.tradeName,
+                phone: editCompany.phone,
+                floor: editCompany.floor || '',
+                room: editCompany.room || ''
             });
         } else {
             reset();
@@ -137,7 +138,7 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-row gap-2">
-                <div className="w-1/6">
+                <div className="w-3/12">
                     <Controller
                         name={"cnpj"}
                         control={control}
@@ -156,26 +157,28 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                         )}
                     />
                 </div>
-                <div className="w-3/6">
+                <div className="w-5/12">
                     <Input
-                        {...register('razaoSocial')}
+                        {...register('companyName')}
                         fullWidth
                         label="Razão Social"
-                        placeholder="Digite a razão social"
-                        errorMessage={errors.razaoSocial?.message?.toString()}
-                        isInvalid={errors.razaoSocial?.message ? true : false}
+                        placeholder="Digite a razsão social"
+                        errorMessage={errors.companyName?.message?.toString()}
+                        isInvalid={errors.companyName?.message ? true : false}
                         maxLength={60}
+                        autoComplete='off'
                     />
                 </div>
-                <div className="w-2/6">
+                <div className="w-4/12">
                     <Input
-                        {...register('nomeFantasia')}
+                        {...register('tradeName')}
                         fullWidth
                         label="Nome fantasia"
                         placeholder="Digite o nome fantasia"
-                        errorMessage={errors.nomeFantasia?.message?.toString()}
-                        isInvalid={errors.nomeFantasia?.message ? true : false}
+                        errorMessage={errors.tradeName?.message?.toString()}
+                        isInvalid={errors.tradeName?.message ? true : false}
                         maxLength={70}
+                        autoComplete='off'
                     />
                 </div>
             </div>
@@ -183,7 +186,7 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
             <div className="flex flex-row gap-2">
                 <div className="w-1/3">
                     <Controller
-                        name={"telefone"}
+                        name={"phone"}
                         control={control}
                         defaultValue=""
                         render={({ field: { onChange, value } }) => (
@@ -193,8 +196,8 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                                 placeholder="(99) 9999-9999"
                                 fullWidth
                                 label="Telefone"
-                                errorMessage={errors.telefone?.message?.toString()}
-                                isInvalid={errors.telefone?.message ? true : false}
+                                errorMessage={errors.phone?.message?.toString()}
+                                isInvalid={errors.phone?.message ? true : false}
                                 maxLength={14}
                             />
                         )}
@@ -202,7 +205,7 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                 </div>
                 <div className="w-1/3">
                     <Controller
-                        name={"andar"}
+                        name={"floor"}
                         control={control}
                         defaultValue=""
                         render={({ field: { onChange, value } }) => (
@@ -211,9 +214,9 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                                 onChange={(e) => onChange(maskNumbers(e.target.value))}
                                 fullWidth
                                 label="Andar"
-                                placeholder="Digite o andar"
-                                errorMessage={errors.andar?.message?.toString()}
-                                isInvalid={errors.andar?.message ? true : false}
+                                placeholder="Digite o floor"
+                                errorMessage={errors.floor?.message?.toString()}
+                                isInvalid={errors.floor?.message ? true : false}
                                 maxLength={3}
                             />
                         )}
@@ -221,12 +224,12 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                 </div>
                 <div className="w-1/3">
                     <Input
-                        {...register('sala')}
+                        {...register('room')}
                         fullWidth
                         label="Sala"
                         placeholder="Digite a sala"
-                        errorMessage={errors.sala?.message?.toString()}
-                        isInvalid={errors.sala?.message ? true : false}
+                        errorMessage={errors.room?.message?.toString()}
+                        isInvalid={errors.room?.message ? true : false}
                         maxLength={6}
                     />
                 </div>
@@ -246,7 +249,7 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                     )}
                     {loadingForm ? (
                         <Button type={"button"} className={`bg-gray-500 text-white rounded-full`}>
-                            <DynamicIcon icon="FaSpinner" />
+                            <Loading size={4} />
                             {editCompany ? 'Editando' : 'Cadastrando'}
                         </Button>
                     ) : (

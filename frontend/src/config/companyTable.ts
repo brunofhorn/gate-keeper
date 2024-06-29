@@ -1,8 +1,8 @@
 const columnsCompany = [
-    { name: "Nome fantasia", uid: "nomeFantasia" },
+    { name: "Nome fantasia", uid: "companyName" },
     { name: "CNPJ", uid: "cnpj" },
-    { name: "Telefone", uid: "telefone" },
-    { name: "Andar / Sala", uid: "andar" },
+    { name: "Telefone", uid: "phone" },
+    { name: "Andar / Sala", uid: "floor" },
     { name: "Ações", uid: "actions" },
 ];
 
