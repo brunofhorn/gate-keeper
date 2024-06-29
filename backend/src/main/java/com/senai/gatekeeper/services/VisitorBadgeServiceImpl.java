@@ -36,6 +36,7 @@ public class VisitorBadgeServiceImpl implements VisitorBadgeService {
             existingBadge.setCpf(visitorBadge.getCpf());
             existingBadge.setCompanyToVisit(visitorBadge.getCompanyToVisit());
             existingBadge.setContactPhone(visitorBadge.getContactPhone());
+            existingBadge.setAllowedAreas(visitorBadge.getAllowedAreas());
             return visitorBadgeRepository.save(existingBadge);
         }
         return null;

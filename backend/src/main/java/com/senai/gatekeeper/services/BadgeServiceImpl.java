@@ -46,6 +46,7 @@ public class BadgeServiceImpl implements BadgeService {
             existingBadge.setBadgeCode(badge.getBadgeCode());
             existingBadge.setEmployeeId(badge.getEmployeeId());
             existingBadge.setCompanyId(badge.getCompanyId());
+            existingBadge.setAllowedAreas(badge.getAllowedAreas());
             return badgeRepository.save(existingBadge);
         }
         return null;

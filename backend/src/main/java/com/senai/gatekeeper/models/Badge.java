@@ -3,6 +3,8 @@ package com.senai.gatekeeper.models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "badges")
 public class Badge {
 
@@ -12,6 +14,7 @@ public class Badge {
     private String badgeCode;
     private String employeeId;
     private String companyId;
+    private List allowedAreas;
 
     // getters and setters
     public String getId() {
@@ -44,5 +47,13 @@ public class Badge {
 
     public void setCompanyId(String companyId) {
         this.companyId = companyId;
+    }
+
+    public List getAllowedAreas() {
+        return allowedAreas;
+    }
+
+    public void setAllowedAreas(List allowedAreas) {
+        this.allowedAreas = allowedAreas;
     }
 }
