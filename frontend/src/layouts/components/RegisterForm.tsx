@@ -9,8 +9,8 @@ import { z } from "zod";
 import DynamicIcon from "../helpers/DynamicIcon";
 import { Button } from "@nextui-org/button";
 import { Loading } from "./Loading";
-import InputMask from "./InputMask";
 import { MergeWithAs } from "@nextui-org/system";
+import { maskCpf } from "@/service/functions/maskCpf";
 
 const registerSchema = z.object({
     name: z.string().min(1, { message: "O nome é obrigatório." }),
@@ -104,27 +104,18 @@ const RegisterForm = () => {
                 </div>
                 <div>
                     <Controller
-                        name="cpf"
+                        name={"cpf"}
                         control={control}
-                        render={({ field }) => (
-                            <InputMask
-                                {...field}
-                                mask={[/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/]}
-                                placeholder="Digite o seu CPF"
-                                render={(ref: Ref<HTMLInputElement> | undefined, props: JSX.IntrinsicAttributes & MergeWithAs<Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "ref">, Omit<Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "ref">, never>, InputProps, "input">) => (
-                                    <Input
-                                        {...props}
-                                        ref={ref}
-                                        label="CPF"
-                                        isRequired
-                                        startContent={
-                                            <DynamicIcon icon="FaIdCard" className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                                        }
-                                        errorMessage={errors.cpf?.message?.toString()}
-                                        isInvalid={!!errors.cpf?.message}
-                                        classNames={{ label: "pb-1" }}
-                                    />
-                                )}
+                        defaultValue=""
+                        render={({ field: { onChange, value } }) => (
+                            <Input
+                                value={value}
+                                onChange={(e) => onChange(maskCpf(e.target.value))}
+                                placeholder="000.000.000-00"
+                                fullWidth
+                                label="CPF"
+                                errorMessage={errors.cpf?.message?.toString()}
+                                isInvalid={errors.cpf?.message ? true : false}
                             />
                         )}
                     />
