@@ -64,11 +64,12 @@ export default function Devices() {
     const confirmRemoveDevice = async () => {
         if (deviceToRemove !== null) {
             try {
+                setShowConfirmModal(false);
+                setLoadingDevices(true);
+
                 const response = await fetch(`/api/device/${deviceToRemove.id}`, {
                     method: 'DELETE',
                 });
-
-                setShowConfirmModal(false);
 
                 if (response.ok) {
                     toast.success("O dispositivo foi removido com sucesso.");
