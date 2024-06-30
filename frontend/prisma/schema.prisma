@@ -8,14 +8,15 @@ datasource db {
 }
 
 model Company {
-  id          String  @id @default(uuid())
-  cnpj        String  @unique
+  id          String     @id @default(uuid())
+  cnpj        String     @unique
   companyName String
   tradeName   String
   phone       String
   floor       String?
   room        String?
   areas       Area[]
+  employees   Employee[]
 }
 
 model User {
@@ -44,4 +45,18 @@ model Device {
   image       String
   belongsArea Area   @relation(fields: [areaId], references: [id])
   areaId      String
+}
+
+model Employee {
+  id         String  @id @default(uuid())
+  name       String
+  mobile     String
+  email      String
+  cpf        String
+  birthDate  String
+  avatar     String
+  role       String
+  department String
+  company    Company @relation(fields: [companyId], references: [id])
+  companyId  String
 }

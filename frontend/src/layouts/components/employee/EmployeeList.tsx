@@ -2,7 +2,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Pagination } from "@nextui-org/react";
 import { IUser, columns, users } from "@/service/mock/employees";
-import DynamicIcon from "../helpers/DynamicIcon";
+import DynamicIcon from "../../helpers/DynamicIcon";
 
 type Status = 'active' | 'paused' | 'vacation';
 
