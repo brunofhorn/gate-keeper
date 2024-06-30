@@ -2,7 +2,9 @@
 
 import { IEmployee } from "@/interfaces/employee";
 import Modal from "@/layouts/components/Modal";
+import { EmployeeDetail } from "@/layouts/components/employee/EmployeeDetail";
 import EmployeeForm from "@/layouts/components/employee/EmployeeForm";
+import EmployeeList from "@/layouts/components/employee/EmployeeList";
 import PageTitle from "@/layouts/partials/PageTitle";
 import { Button, Spacer } from "@nextui-org/react";
 import { useEffect, useState } from "react";
@@ -62,11 +64,12 @@ export default function Employees() {
     const confirmRemoveEmployee = async () => {
         if (employeeToRemove !== null) {
             try {
+                setShowConfirmModal(false);
+                setLoadingEmployees(true);
+
                 const response = await fetch(`/api/employee/${employeeToRemove.id}`, {
                     method: 'DELETE',
                 });
-
-                setShowConfirmModal(false);
 
                 if (response.ok) {
                     toast.success("O funcionário foi removido com sucesso.");
@@ -97,7 +100,7 @@ export default function Employees() {
 
     return (
         <>
-            <PageTitle title="Dispositivos" />
+            <PageTitle title="Funcionários" />
             <div className="bg-black h-screen p-10 pb-44 overflow-y-auto">
                 <EmployeeForm
                     addEmployee={addEmployee}
@@ -106,6 +109,15 @@ export default function Employees() {
                     updateEmployee={updateEmployee}
                 />
                 <Spacer y={8} />
+                <EmployeeList
+                    employees={employees}
+                    filteredEmployees={filteredEmployees}
+                    setFilteredEmployees={setFilteredEmployees}
+                    loadingEmployees={loadingEmployees}
+                    onDetail={handleDetailEmployee}
+                    onEdit={handleEditEmployee}
+                    onRemove={handleRemoveEmployee}
+                />
             </div>
             <Modal
                 open={showConfirmModal}
@@ -121,7 +133,7 @@ export default function Employees() {
                     </Button>
                 ]}
             />
-            {/* <Modal
+            <Modal
                 open={showDetailModal}
                 title="Detalhes do Funcionário"
                 message={<EmployeeDetail {...detailEmployee} />}
@@ -132,7 +144,7 @@ export default function Employees() {
                         Fechar
                     </Button>
                 ]}
-            /> */}
+            />
         </>
     );
 }

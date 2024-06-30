@@ -1,118 +1,162 @@
 "use client";
-import React, { useCallback, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Pagination } from "@nextui-org/react";
-import { IUser, columns, users } from "@/service/mock/employees";
+import React, { useCallback, useEffect, useState } from "react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Pagination, Input, User } from "@nextui-org/react";
 import DynamicIcon from "../../helpers/DynamicIcon";
+import { Loading } from "../Loading";
+import { EmployeeListProps, IEmployee } from "@/interfaces/employee";
+import { maskCpf } from "@/service/functions/maskCpf";
+import { columnsEmployee } from "@/config/employeeTable";
 
-type Status = 'active' | 'paused' | 'vacation';
-
-// Define o mapeamento com tipagem explícita
-const statusColorMap: Record<Status, "success" | "danger" | "warning"> = {
-    active: "success",
-    paused: "danger",
-    vacation: "warning",
-};
-
-export default function EmployeeList() {
-    const renderCell = useCallback((user: IUser, columnKey: keyof IUser | 'actions') => {
+export default function EmployeeList({ loadingEmployees, employees, filteredEmployees, setFilteredEmployees, onEdit, onRemove, onDetail }: EmployeeListProps) {
+    const renderCell = useCallback((employee: IEmployee, columnKey: keyof IEmployee | 'actions') => {
         if (columnKey === 'actions') {
             return (
-                <div className="relative flex items-center gap-2">
-                    <Tooltip content="Detalhes">
+                <div className="relative flex justify-center gap-2">
+                    <Tooltip content="Visualizar Detalhes">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <DynamicIcon icon="FaEye" />
+                            <a onClick={() => onDetail(employee)}>
+                                <DynamicIcon icon="FaEye" />
+                            </a>
                         </span>
                     </Tooltip>
                     <Tooltip content="Editar Funcionário">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <DynamicIcon icon="FaPencil" />
+                            <a onClick={() => onEdit(employee)}>
+                                <DynamicIcon icon="FaPencil" />
+                            </a>
                         </span>
                     </Tooltip>
                     <Tooltip color="danger" content="Deletar Funcionário">
                         <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                            <DynamicIcon icon="FaTrash" />
+                            <a onClick={() => onRemove(employee)}>
+                                <DynamicIcon icon="FaTrash" />
+                            </a>
                         </span>
                     </Tooltip>
                 </div>
             );
         }
 
-        const cellValue = user[columnKey];
-
+        const cellValue = employee[columnKey] as string;
         switch (columnKey) {
+
             case "name":
                 return (
                     <User
-                        avatarProps={{ radius: "lg", src: user.avatar }}
-                        description={user.email}
+                        avatarProps={{
+                            radius: "lg",
+                            src: employee.avatar,
+                            showFallback: true,
+                            fallback: <DynamicIcon icon="FaUser" />
+                        }}
+                        description={employee.email}
                         name={cellValue}
                     >
-                        {user.email}
+                        {employee.email}
                     </User>
                 );
-            case "role":
+            case "cpf":
+                return (
+                    <p className="text-bold text-sm">{maskCpf(cellValue)}</p>
+                );
+            case "company":
+                return (
+                    <p className="text-bold text-sm">{employee.company.tradeName}</p>
+                );
+            case "department":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue}</p>
-                        <p className="text-bold text-sm capitalize text-default-400">{user.team}</p>
+                        <p className="text-bold text-sm">{cellValue}</p>
+                        <p className="text-bold text-sm text-default-400">{employee.role}</p>
                     </div>
-                );
-            case "status":
-                const status = user.status as Status;
-                return (
-                    <Chip className="capitalize" color={statusColorMap[status]} size="sm" variant="flat">
-                        {cellValue}
-                    </Chip>
                 );
             default:
                 return cellValue;
         }
     }, []);
 
-    const [page, setPage] = useState(1);
-    const rowsPerPage = 4;
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
+    const [search, setSearch] = useState('');
 
-    const pages = Math.ceil(users.length / rowsPerPage);
+    useEffect(() => {
+        setFilteredEmployees(
+            employees.filter(employee =>
+                employee.name.toLowerCase().includes(search.toLowerCase())
+            )
+        );
+        setCurrentPage(1);
+    }, [search, employees]);
 
-    const items = useMemo(() => {
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value);
+    };
 
-        return users.slice(start, end);
-    }, [page, users]);
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredEmployees.slice(indexOfFirstItem, indexOfLastItem);
+
+    const onClear = useCallback(() => {
+        setSearch("");
+        setCurrentPage(1);
+    }, []);
 
     return (
-        <Table
-            aria-label="Example table with custom cells"
-            isStriped
-            bottomContent={
-                <div className="flex w-full justify-center">
-                    <Pagination
-                        isCompact
-                        showControls
-                        showShadow
-                        color="primary"
-                        page={page}
-                        total={pages}
-                        onChange={(page) => setPage(page)}
-                    />
-                </div>
-            }
-        >
-            <TableHeader columns={columns}>
-                {(column) => (
-                    <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
-                        {column.name}
-                    </TableColumn>
-                )}
-            </TableHeader>
-            <TableBody items={items}>
-                {(item) => (
-                    <TableRow key={item.id}>
-                        {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IUser)}</TableCell>}
-                    </TableRow>
-                )}
-            </TableBody>
-        </Table>
+        <>
+            <Table
+                aria-label="Tabela de Funcionários"
+                isStriped
+                bottomContent={
+                    !loadingEmployees && (
+                        <div className="flex w-full justify-center">
+                            <Pagination
+                                isCompact
+                                showShadow
+                                total={Math.ceil(filteredEmployees.length / itemsPerPage)}
+                                initialPage={1}
+                                onChange={(page) => handlePageChange(page)}
+                            />
+                        </div>
+                    )
+                }
+                topContent={
+                    <div className="flex flex-col gap-4">
+                        <div className="flex justify-between gap-3 items-end">
+                            <Input
+                                isClearable
+                                className="w-full sm:max-w-[44%]"
+                                placeholder="Buscar por nome..."
+                                startContent={<DynamicIcon icon={"FaMagnifyingGlass"} />}
+                                value={search}
+                                onClear={() => onClear()}
+                                onChange={handleSearch}
+                            />
+                        </div>
+                    </div>
+                }
+            >
+                <TableHeader columns={columnsEmployee}>
+                    {(column) => (
+                        <TableColumn
+                            key={column.uid}
+                            align={column.uid === "actions" ? "center" : "start"}
+                        >
+                            {column.name}
+                        </TableColumn>
+                    )}
+                </TableHeader>
+                <TableBody items={currentItems} isLoading={loadingEmployees} loadingContent={<Loading />}>
+                    {(item) => (
+                        <TableRow key={item.id}>
+                            {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IEmployee)}</TableCell>}
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </>
     );
 }

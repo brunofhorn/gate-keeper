@@ -64,11 +64,12 @@ export default function Areas() {
     const confirmRemoveArea = async () => {
         if (areaToRemove !== null) {
             try {
+                setShowConfirmModal(false);
+                setLoadingAreas(true);
+
                 const response = await fetch(`/api/area/${areaToRemove.id}`, {
                     method: 'DELETE',
                 });
-
-                setShowConfirmModal(false);
 
                 if (response.ok) {
                     toast.success("A área foi removida com sucesso.");

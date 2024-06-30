@@ -63,11 +63,12 @@ export default function Companies() {
     const confirmRemoveCompany = async () => {
         if (companyToRemove !== null) {
             try {
+                setShowConfirmModal(false);
+                setLoadingCompanies(true);
+
                 const response = await fetch(`/api/company/${companyToRemove.id}`, {
                     method: 'DELETE',
                 });
-
-                setShowConfirmModal(false);
 
                 if (response.ok) {
                     toast.success("A empresa foi removida com sucesso.");

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Input, Button, Spacer, DateInput } from '@nextui-org/react';
+import { Input, Button, Spacer, Select, SelectItem } from '@nextui-org/react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,30 +11,36 @@ import { ICompany } from '@/interfaces/company';
 import { toast } from 'react-toastify';
 import { Loading } from '../Loading';
 import { maskCpf } from '@/service/functions/maskCpf';
-import { CalendarDate, parseDate } from '@internationalized/date';
+import { maskDate } from '@/service/functions/maskDate';
+import { maskMobile } from '@/service/functions/maskMobile';
+import { maskCnpj } from '@/service/functions/maskCnpj';
+import { validateCpf } from '@/service/functions/validateCpf';
+import { validateDate } from '@/service/functions/validateDate';
+import { formatDateToBrazilian } from '@/service/functions/formatDateToBrazilian';
 
 const employeeSchema = z.object({
     name: z.string().min(1, { message: "O nome é obrigatório." }),
     birthDate: z.string().min(1, { message: "A data de nascimento é obrigatória." }),
     company: z.string().min(1, { message: 'A empresa é obrigatória.' }),
-    role: z.string().min(1, { message: "O cargo é obrigatório." }),
-    department: z.string().min(1, { message: "O setor é obrigatório." }),
-    mobile: z.string().min(1, { message: "O celular é obrigatório." }),
-    cpf: z.string().min(1, { message: "O CPF é obrigatório." })
+    role: z.string().min(1, { message: "O cargo é obrigatório." }).max(30, { message: "O tamanho máximo do campo é 30 caracteres." }),
+    department: z.string().min(1, { message: "O setor é obrigatório." }).max(50, { message: "O tamanho máximo do campo é 50 caracteres." }),
+    mobile: z.string().min(1, { message: "O celular é obrigatório." }).max(16, { message: "O celular está incorreto." }),
+    email: z.string().min(1, { message: "O e-mail é obrigatório." }).max(80, { message: "O tamanho máximo do campo é 80 caracteres." }),
+    cpf: z.string().min(1, { message: "O CPF é obrigatório." }).max(14, { message: "O tamanho máximo do campo é 11 caracteres." })
 });
 
-type EmployeeFormData = z.infer<typeof employeeSchema>;
+export type EmployeeFormData = z.infer<typeof employeeSchema>;
 
 const EmployeeForm = ({ addEmployee, editEmployee, setEditEmployee, updateEmployee }: EmployeeFormProps) => {
     const [loadingForm, setLoadingForm] = useState<boolean>(false);
     const [loadingCompanies, setLoadingCompanies] = useState<boolean>(true);
-    const [companies, setCompanies] = useState<ICompany[]>();
-    const { handleSubmit, control, clearErrors, reset, setValue, formState: { errors, isSubmitSuccessful } } = useForm<EmployeeFormData>({
+    const [companies, setCompanies] = useState<ICompany[]>([]);
+    const { handleSubmit, control, clearErrors, reset, setValue, setError, setFocus, formState: { errors, isSubmitSuccessful } } = useForm<EmployeeFormData>({
         resolver: zodResolver(employeeSchema),
         defaultValues: {
             name: "",
             cpf: "",
-            birthDate: undefined,
+            birthDate: "",
             company: "",
             department: "",
             mobile: "",
@@ -49,12 +55,11 @@ const EmployeeForm = ({ addEmployee, editEmployee, setEditEmployee, updateEmploy
             try {
                 const response = await fetch("/api/company");
                 if (response.ok) {
-                    const data: ICompany[] = await response.json();
-
+                    const data = await response.json();
                     setCompanies(data);
                     setLoadingCompanies(false);
                 } else {
-                    console.error("Erro ao buscar as empresas:", response.status);
+                    console.error("Erro ao buscar empresas:", response.status);
                 }
             } catch (error) {
                 console.error("Erro ao buscar empresas:", error);
@@ -69,14 +74,34 @@ const EmployeeForm = ({ addEmployee, editEmployee, setEditEmployee, updateEmploy
 
         try {
             if (editEmployee) {
-                const updatedEmployee = { ...editEmployee, ...data };
+                if (!validateCpf(data.cpf)) {
+                    setError("cpf", { message: "CPF inválido.", type: "validate" });
+                    setFocus("cpf");
+                    return;
+                }
 
-                const response = await fetch(`/api/employee/${updatedEmployee.id}`, {
+                const correctDate = validateDate(data.birthDate);
+
+                if (!correctDate) {
+                    setError("birthDate", { message: "Data de nascimento inválida.", type: "validate" });
+                    setFocus("birthDate");
+                    return;
+                }
+
+                const response = await fetch(`/api/employee/${editEmployee.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(updatedEmployee),
+                    body: JSON.stringify(
+                        {
+                            ...editEmployee,
+                            ...data,
+                            birthDate: correctDate,
+                            cpf: data?.cpf?.replace(/\D/g, "").toString(),
+                            mobile: data?.mobile?.replace(/\D/g, "").toString()
+                        }
+                    ),
                 });
 
                 if (response.ok) {
@@ -91,19 +116,44 @@ const EmployeeForm = ({ addEmployee, editEmployee, setEditEmployee, updateEmploy
                     toast.error(response.statusText);
                 }
             } else {
+                if (!validateCpf(data.cpf)) {
+                    setError("cpf", { message: "CPF inválido.", type: "validate" });
+                    setFocus("cpf");
+                    return;
+                }
+
+                const correctDate = validateDate(data.birthDate);
+
+                if (!correctDate) {
+                    setError("birthDate", { message: "Data de nascimento inválida.", type: "validate" });
+                    setFocus("birthDate");
+                    return;
+                }
+
                 const response = await fetch('/api/employee', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify({
+                        ...data,
+                        birthDate: correctDate,
+                        cpf: data?.cpf?.replace(/\D/g, "").toString(),
+                        mobile: data?.mobile?.replace(/\D/g, "").toString()
+                    }),
                 });
 
                 if (response.ok) {
-                    toast.success("O funcionário foi cadastrado com sucesso.");
+                    if (response.status === 200) {
+                        toast.warn("O CPF informado já está cadastrado.");
+                        setError("cpf", { message: "CPF já existe.", type: "validate" });
+                        setFocus("cpf");
+                    } else {
+                        toast.success("O funcionário foi cadastrado com sucesso.");
 
-                    const createdEmployee = await response.json();
-                    addEmployee(createdEmployee);
+                        const createdEmployee = await response.json();
+                        addEmployee(createdEmployee);
+                    }
                 } else {
                     toast.error(response.statusText);
                 }
@@ -119,7 +169,7 @@ const EmployeeForm = ({ addEmployee, editEmployee, setEditEmployee, updateEmploy
     const resetFields = () => {
         reset({
             name: "",
-            birthDate: undefined,
+            birthDate: "",
             cpf: "",
             company: undefined,
             department: "",
@@ -153,12 +203,13 @@ const EmployeeForm = ({ addEmployee, editEmployee, setEditEmployee, updateEmploy
     useEffect(() => {
         if (editEmployee) {
             setValue("name", editEmployee.name);
-            setValue("birthDate", editEmployee.birthDate);
+            setValue("birthDate", formatDateToBrazilian(editEmployee.birthDate));
             setValue("company", editEmployee.company.id);
-            setValue("cpf", editEmployee.cpf);
+            setValue("cpf", maskCpf(editEmployee.cpf));
             setValue("department", editEmployee.department);
-            setValue("mobile", editEmployee.mobile);
+            setValue("mobile", maskMobile(editEmployee.mobile));
             setValue("role", editEmployee.role);
+            setValue("email", editEmployee.email);
         } else {
             reset();
         }
@@ -209,13 +260,121 @@ const EmployeeForm = ({ addEmployee, editEmployee, setEditEmployee, updateEmploy
                         name={"birthDate"}
                         control={control}
                         defaultValue={undefined}
-                        render={({ field }) => (
-                            <DateInput
+                        render={({ field: { value, onChange } }) => (
+                            <Input
+                                value={value}
+                                onChange={(e) => onChange(maskDate(e.target.value))}
+                                placeholder="dd/mm/aaaa"
                                 fullWidth
-                                placeholderValue={new CalendarDate(2024, 30, 6)}
                                 label="Data de Nascimento"
                                 errorMessage={errors.birthDate?.message?.toString()}
                                 isInvalid={errors.birthDate?.message ? true : false}
+                            />
+                        )}
+                    />
+                </div>
+            </div>
+            <Spacer y={2} />
+            <div className="flex flex-row gap-2">
+                <div className="w-1/6">
+                    <Controller
+                        name={"mobile"}
+                        control={control}
+                        defaultValue={undefined}
+                        render={({ field: { value, onChange } }) => (
+                            <Input
+                                value={value}
+                                onChange={(e) => onChange(maskMobile(e.target.value))}
+                                placeholder="(99) 9 9999-9999"
+                                fullWidth
+                                label="Celular"
+                                errorMessage={errors.mobile?.message?.toString()}
+                                isInvalid={errors.mobile?.message ? true : false}
+                            />
+                        )}
+                    />
+                </div>
+                <div className="w-2/6">
+                    <Controller
+                        name={"email"}
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                fullWidth
+                                label="E-mail"
+                                placeholder="Digite o e-mail do funcionário"
+                                errorMessage={errors.email?.message?.toString()}
+                                isInvalid={errors.email?.message ? true : false}
+                                maxLength={80}
+                            />
+                        )}
+                    />
+                </div>
+                <div className="w-3/6">
+                    <Controller
+                        name={"company"}
+                        control={control}
+                        defaultValue={undefined}
+                        render={({ field }) => (
+                            <Select
+                                {...field}
+                                isLoading={loadingCompanies}
+                                items={companies}
+                                label="Empresa"
+                                placeholder="Selecione a empresa"
+                                errorMessage={errors.company?.message?.toString()}
+                                isInvalid={errors.company?.message ? true : false}
+                                selectedKeys={field.value ? [field.value] : undefined}
+                                renderValue={(items) => {
+                                    return items.map((item) => (
+                                        <div key={item.key}>
+                                            {item.textValue}
+                                        </div>
+                                    ));
+                                }}
+                            >
+                                {(company) => <SelectItem key={company.id} value={company.id} textValue={`${company.tradeName} (${maskCnpj(company.cnpj)})`}>{company.tradeName} ({maskCnpj(company.cnpj)})</SelectItem>}
+                            </Select>
+                        )}
+                    />
+                </div>
+            </div>
+            <Spacer y={2} />
+            <div className="flex flex-row gap-2">
+                <div className="w-2/6">
+                    <Controller
+                        name={"department"}
+                        control={control}
+                        defaultValue={undefined}
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                fullWidth
+                                label="Departamento"
+                                placeholder="Digite o departamento do funcionário"
+                                errorMessage={errors.department?.message?.toString()}
+                                isInvalid={errors.department?.message ? true : false}
+                                maxLength={50}
+                            />
+                        )}
+                    />
+                </div>
+                <div className="w-2/6">
+                    <Controller
+                        name={"role"}
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                fullWidth
+                                label="Cargo"
+                                placeholder="Digite o cargo do funcionário"
+                                errorMessage={errors.role?.message?.toString()}
+                                isInvalid={errors.role?.message ? true : false}
+                                maxLength={30}
                             />
                         )}
                     />
