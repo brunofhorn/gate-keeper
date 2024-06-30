@@ -4,7 +4,7 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Toolti
 import DynamicIcon from "../../helpers/DynamicIcon";
 import { Loading } from "../Loading";
 import { DeviceListProps, IDevice } from "@/interfaces/device";
-import { columnsDevice } from "@/config/deviceTable";
+import { columnsDevice } from "@/config/columnsTable";
 
 export default function DeviceList({ loadingDevices, devices, filteredDevices, setFilteredDevices, onEdit, onRemove, onDetail }: DeviceListProps) {
     const renderCell = useCallback((device: IDevice, columnKey: keyof IDevice | 'actions') => {

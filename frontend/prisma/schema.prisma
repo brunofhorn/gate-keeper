@@ -32,9 +32,9 @@ model Area {
   id          String   @id @default(uuid())
   name        String
   description String
-  company     Company  @relation(fields: [companyId], references: [id])
   companyId   String
   devices     Device[]
+  company     Company  @relation(fields: [companyId], references: [id])
 }
 
 model Device {
@@ -43,8 +43,8 @@ model Device {
   description String
   ip          String
   image       String
-  belongsArea Area   @relation(fields: [areaId], references: [id])
   areaId      String
+  belongsArea Area   @relation(fields: [areaId], references: [id])
 }
 
 model Employee {
@@ -60,3 +60,16 @@ model Employee {
   company    Company @relation(fields: [companyId], references: [id])
   companyId  String
 }
+
+model Visitor {
+  id     String @id @default(uuid())
+  name   String
+  cpf    String @unique
+  mobile String
+}
+
+// visitInitialDate       String
+//   visitEndDate           String
+//   observations           String
+//   employeeId             String
+//   responsibleForTheVisit Employee @relation(fields: [employeeId], references: [id])

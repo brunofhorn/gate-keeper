@@ -1,33 +1,35 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Pagination, Input } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Pagination, Input, User } from "@nextui-org/react";
 import DynamicIcon from "../../helpers/DynamicIcon";
 import { Loading } from "../Loading";
-import { AreaListProps, IArea } from "@/interfaces/area";
-import { columnsArea } from "@/config/columnsTable";
+import { maskCpf } from "@/service/functions/maskCpf";
+import { columnsVisitor } from "@/config/columnsTable";
+import { IVisitor, VisitorListProps } from "@/interfaces/visitor";
+import { maskMobile } from "@/service/functions/maskMobile";
 
-export default function AreaList({ loadingAreas, areas, filteredAreas, setFilteredAreas, onEdit, onRemove, onDetail }: AreaListProps) {
-    const renderCell = useCallback((area: IArea, columnKey: keyof IArea | 'actions') => {
+export default function VisitorList({ loadingVisitors, visitors, filteredVisitors, setFilteredVisitors, onEdit, onRemove, onDetail }: VisitorListProps) {
+    const renderCell = useCallback((visitor: IVisitor, columnKey: keyof IVisitor | 'actions') => {
         if (columnKey === 'actions') {
             return (
                 <div className="relative flex justify-center gap-2">
                     <Tooltip content="Visualizar Detalhes">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <a onClick={() => onDetail(area)}>
+                            <a onClick={() => onDetail(visitor)}>
                                 <DynamicIcon icon="FaEye" />
                             </a>
                         </span>
                     </Tooltip>
-                    <Tooltip content="Editar Área">
+                    <Tooltip content="Editar Visitante">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <a onClick={() => onEdit(area)}>
+                            <a onClick={() => onEdit(visitor)}>
                                 <DynamicIcon icon="FaPencil" />
                             </a>
                         </span>
                     </Tooltip>
-                    <Tooltip color="danger" content="Deletar Área">
+                    <Tooltip color="danger" content="Deletar Visitante">
                         <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                            <a onClick={() => onRemove(area)}>
+                            <a onClick={() => onRemove(visitor)}>
                                 <DynamicIcon icon="FaTrash" />
                             </a>
                         </span>
@@ -36,24 +38,20 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
             );
         }
 
-        const cellValue = area[columnKey] as string;
-
+        const cellValue = visitor[columnKey] as string;
         switch (columnKey) {
+
             case "name":
                 return (
                     <p className="text-bold text-sm">{cellValue}</p>
                 );
-            case "description":
+            case "cpf":
                 return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-sm">{cellValue.slice(0, 99)}{cellValue.length > 99 && "..."}</p>
-                    </div>
+                    <p className="text-bold text-sm">{maskCpf(cellValue)}</p>
                 );
-            case "companyTradeName":
+            case "mobile":
                 return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-sm">{cellValue}</p>
-                    </div>
+                    <p className="text-bold text-sm">{maskMobile(cellValue)}</p>
                 );
             default:
                 return cellValue;
@@ -65,13 +63,13 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
     const [search, setSearch] = useState('');
 
     useEffect(() => {
-        setFilteredAreas(
-            areas.filter(area =>
-                area.name.toLowerCase().includes(search.toLowerCase())
+        setFilteredVisitors(
+            visitors.filter(visitor =>
+                visitor.name.toLowerCase().includes(search.toLowerCase())
             )
         );
         setCurrentPage(1);
-    }, [search, areas]);
+    }, [search, visitors]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -83,7 +81,7 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredAreas.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredVisitors.slice(indexOfFirstItem, indexOfLastItem);
 
     const onClear = useCallback(() => {
         setSearch("");
@@ -93,15 +91,15 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
     return (
         <>
             <Table
-                aria-label="Tabela de Áreas"
+                aria-label="Tabela de Funcionários"
                 isStriped
                 bottomContent={
-                    !loadingAreas && (
+                    !loadingVisitors && (
                         <div className="flex w-full justify-center">
                             <Pagination
                                 isCompact
                                 showShadow
-                                total={Math.ceil(filteredAreas.length / itemsPerPage)}
+                                total={Math.ceil(filteredVisitors.length / itemsPerPage)}
                                 initialPage={1}
                                 onChange={(page) => handlePageChange(page)}
                             />
@@ -124,21 +122,20 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
                     </div>
                 }
             >
-                <TableHeader columns={columnsArea}>
+                <TableHeader columns={columnsVisitor}>
                     {(column) => (
                         <TableColumn
                             key={column.uid}
                             align={column.uid === "actions" ? "center" : "start"}
-                            width={column.uid === "description" ? 300 : 100}
                         >
                             {column.name}
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={currentItems} isLoading={loadingAreas} loadingContent={<Loading />}>
+                <TableBody items={currentItems} isLoading={loadingVisitors} loadingContent={<Loading />} emptyContent="Nenhum visitante cadastrado">
                     {(item) => (
                         <TableRow key={item.id}>
-                            {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IArea)}</TableCell>}
+                            {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IVisitor)}</TableCell>}
                         </TableRow>
                     )}
                 </TableBody>

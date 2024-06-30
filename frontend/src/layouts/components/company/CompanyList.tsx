@@ -4,7 +4,7 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Toolti
 import DynamicIcon from "../../helpers/DynamicIcon";
 import { CompanyListProps, ICompany } from "@/interfaces/company";
 import { Loading } from "../Loading";
-import { columnsCompany } from "@/config/companyTable";
+import { columnsCompany } from "@/config/columnsTable";
 import { maskCnpj } from "@/service/functions/maskCnpj";
 import { maskPhone } from "@/service/functions/maskPhone";
 
