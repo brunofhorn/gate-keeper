@@ -3,6 +3,8 @@ package com.senai.gatekeeper.models;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "areas")
 public class Area {
 
@@ -14,8 +16,6 @@ public class Area {
     private String name;
 
     private String description;
-
-    private String deviceIpMacAddress;
 
     // Getters and Setters
     public String getId() {
@@ -42,14 +42,6 @@ public class Area {
         this.description = description;
     }
 
-    public String getDeviceIpMacAddress() {
-        return deviceIpMacAddress;
-    }
-
-    public void setDeviceIpMacAddress(String deviceIpMacAddress) {
-        this.deviceIpMacAddress = deviceIpMacAddress;
-    }
-
     public String getCompanyId() {
         return companyId;
     }
@@ -57,4 +49,5 @@ public class Area {
     public void setCompanyId(String companyId) {
         this.companyId = companyId;
     }
+
 }

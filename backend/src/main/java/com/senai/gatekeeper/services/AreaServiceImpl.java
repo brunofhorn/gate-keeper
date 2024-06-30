@@ -34,7 +34,6 @@ public class AreaServiceImpl implements AreaService {
         if (existingArea != null) {
             existingArea.setName(area.getName());
             existingArea.setDescription(area.getDescription());
-            existingArea.setDeviceIpMacAddress(area.getDeviceIpMacAddress());
             return areaRepository.save(existingArea);
         }
         return null;
