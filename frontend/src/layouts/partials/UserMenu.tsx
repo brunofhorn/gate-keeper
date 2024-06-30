@@ -1,8 +1,20 @@
 "use client";
 
+import { IUser } from "@/interfaces/user";
 import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import { useEffect, useState } from "react";
+import Cookies from 'js-cookie';
 
 const UserMenu = () => {
+    const [user, setUser] = useState<IUser | null>(null);
+
+    useEffect(() => {
+        const userData = Cookies.get('gateKeeperUserData');
+        if (userData) {
+            setUser(JSON.parse(userData));
+        }
+    }, []);
+
     return (
         <>
             <Dropdown placement="bottom-end">
@@ -11,18 +23,12 @@ const UserMenu = () => {
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
                     <DropdownItem key="profile" className="h-14 gap-2">
-                        <p className="font-semibold">Signed in as</p>
-                        <p className="font-semibold">zoey@example.com</p>
+                        <p className="font-semibold">Logado como</p>
+                        <p className="font-semibold">{user ? user.email : 'Carregando...'}</p>
                     </DropdownItem>
-                    <DropdownItem key="settings">My Settings</DropdownItem>
-                    <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                    <DropdownItem key="analytics">Analytics</DropdownItem>
-                    <DropdownItem key="system">System</DropdownItem>
-                    <DropdownItem key="configurations">Configurations</DropdownItem>
-                    <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-                    <DropdownItem key="logout" color="danger">
-                        Log Out
-                    </DropdownItem>
+                    <DropdownItem key="settings">Meu perfil</DropdownItem>
+                    <DropdownItem key="configurations">Configurações</DropdownItem>
+                    <DropdownItem key="logout" color="danger">Sair</DropdownItem>
                 </DropdownMenu>
             </Dropdown>
         </>

@@ -1,4 +1,4 @@
-import { CompanyFormData } from "@/layouts/components/CompanyForm";
+import { CompanyFormData } from "@/layouts/components/company/CompanyForm";
 import { prisma } from "@/service/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -8,7 +8,7 @@ export async function GET() {
     try {
         const companies = await prisma.company.findMany({
             orderBy: {
-                nomeFantasia: "asc"
+                companyName: "asc"
             }
         });
 

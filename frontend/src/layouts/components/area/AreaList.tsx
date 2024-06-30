@@ -1,33 +1,33 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Pagination, Input } from "@nextui-org/react";
-import DynamicIcon from "../helpers/DynamicIcon";
-import { CompanyListProps, ICompany } from "@/interfaces/company";
-import { Loading } from "./Loading";
-import { columnsCompany } from "@/config/companyTable";
+import DynamicIcon from "../../helpers/DynamicIcon";
+import { Loading } from "../Loading";
+import { AreaListProps, IArea } from "@/interfaces/area";
+import { columnsArea } from "@/config/areaTable";
 
-export default function CompanyList({ loadingCompanies, companies, filteredCompanies, setFilteredCompanies, onEdit, onRemove, onDetail }: CompanyListProps) {
-    const renderCell = useCallback((company: ICompany, columnKey: keyof ICompany | 'actions') => {
+export default function AreaList({ loadingAreas, areas, filteredAreas, setFilteredAreas, onEdit, onRemove, onDetail }: AreaListProps) {
+    const renderCell = useCallback((area: IArea, columnKey: keyof IArea | 'actions') => {
         if (columnKey === 'actions') {
             return (
-                <div className="relative flex items-center gap-2">
-                    <Tooltip content="Detalhes">
+                <div className="relative flex justify-center gap-2">
+                    <Tooltip content="Visualizar Detalhes">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <a onClick={() => onDetail(company)}>
+                            <a onClick={() => onDetail(area)}>
                                 <DynamicIcon icon="FaEye" />
                             </a>
                         </span>
                     </Tooltip>
-                    <Tooltip content="Editar Empresa">
+                    <Tooltip content="Editar Área">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <a onClick={() => onEdit(company)}>
+                            <a onClick={() => onEdit(area)}>
                                 <DynamicIcon icon="FaPencil" />
                             </a>
                         </span>
                     </Tooltip>
-                    <Tooltip color="danger" content="Deletar Empresa">
+                    <Tooltip color="danger" content="Deletar Área">
                         <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                            <a onClick={() => onRemove(company)}>
+                            <a onClick={() => onRemove(area)}>
                                 <DynamicIcon icon="FaTrash" />
                             </a>
                         </span>
@@ -36,32 +36,23 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
             );
         }
 
-        const cellValue = company[columnKey];
+        const cellValue = area[columnKey];
 
         switch (columnKey) {
-            case "nomeFantasia":
+            case "name":
+                return (
+                    <p className="text-bold text-sm capitalize">{cellValue}</p>
+                );
+            case "description":
+                return (
+                    <div className="flex flex-col">
+                        <p className="text-bold text-sm capitalize">{cellValue.slice(0, 99)}{cellValue.length > 99 && "..."}</p>
+                    </div>
+                );
+            case "companyTradeName":
                 return (
                     <div className="flex flex-col">
                         <p className="text-bold text-sm capitalize">{cellValue}</p>
-                        <p className="text-bold text-sm capitalize text-default-400">{company.razaoSocial}</p>
-                    </div>
-                );
-            case "cnpj":
-                return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue}</p>
-                    </div>
-                );
-            case "telefone":
-                return (
-                    <>
-                        {cellValue}
-                    </>
-                );
-            case "andar":
-                return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue} {company?.sala && `/ ${company.sala}`}</p>
                     </div>
                 );
             default:
@@ -74,13 +65,13 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
     const [search, setSearch] = useState('');
 
     useEffect(() => {
-        setFilteredCompanies(
-            companies.filter(company =>
-                company.nomeFantasia.toLowerCase().includes(search.toLowerCase())
+        setFilteredAreas(
+            areas.filter(area =>
+                area.name.toLowerCase().includes(search.toLowerCase())
             )
         );
         setCurrentPage(1);
-    }, [search, companies]);
+    }, [search, areas]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -92,7 +83,7 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredCompanies.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredAreas.slice(indexOfFirstItem, indexOfLastItem);
 
     const onClear = useCallback(() => {
         setSearch("");
@@ -102,15 +93,15 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
     return (
         <>
             <Table
-                aria-label="Tabela de Empresas"
+                aria-label="Tabela de Áreas"
                 isStriped
                 bottomContent={
-                    !loadingCompanies && (
+                    !loadingAreas && (
                         <div className="flex w-full justify-center">
                             <Pagination
                                 isCompact
                                 showShadow
-                                total={Math.ceil(filteredCompanies.length / itemsPerPage)}
+                                total={Math.ceil(filteredAreas.length / itemsPerPage)}
                                 initialPage={1}
                                 onChange={(page) => handlePageChange(page)}
                             />
@@ -123,7 +114,7 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
                             <Input
                                 isClearable
                                 className="w-full sm:max-w-[44%]"
-                                placeholder="Buscar por nome fantasia..."
+                                placeholder="Buscar por nome..."
                                 startContent={<DynamicIcon icon={"FaMagnifyingGlass"} />}
                                 value={search}
                                 onClear={() => onClear()}
@@ -133,17 +124,21 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
                     </div>
                 }
             >
-                <TableHeader columns={columnsCompany}>
+                <TableHeader columns={columnsArea}>
                     {(column) => (
-                        <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
+                        <TableColumn
+                            key={column.uid}
+                            align={column.uid === "actions" ? "center" : "start"}
+                            width={column.uid === "description" ? 300 : 100}
+                        >
                             {column.name}
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={currentItems} isLoading={loadingCompanies} loadingContent={<Loading />}>
+                <TableBody items={currentItems} isLoading={loadingAreas} loadingContent={<Loading />}>
                     {(item) => (
                         <TableRow key={item.id}>
-                            {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof ICompany)}</TableCell>}
+                            {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IArea)}</TableCell>}
                         </TableRow>
                     )}
                 </TableBody>

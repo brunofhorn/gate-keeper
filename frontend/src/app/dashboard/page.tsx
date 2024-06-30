@@ -1,13 +1,15 @@
 import MonthCheckins from "@/layouts/charts/MonthCheckins";
 import InfoCard from "@/layouts/components/InfoCard";
 import DynamicIcon from "@/layouts/helpers/DynamicIcon";
+import PageTitle from "@/layouts/partials/PageTitle";
 import { infoData } from "@/service/mock/infoData";
 
 export default function Dashboard() {
     const popularAreas = [1, 2, 3, 4, 5, 6];
     return (
         <>
-            <div className="flex flex-col gap-2">
+            <PageTitle title="Dashboard" />
+            <div className="flex flex-col gap-2 bg-black p-10 pb-44 overflow-y-auto h-screen">
                 <div id="cards" className="flex flex-row gap-2">
                     {infoData.map((card, index) => (
                         <InfoCard key={index} {...card} />
