@@ -3,6 +3,8 @@ package com.senai.gatekeeper.models;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "visitor_badges")
 public class VisitorBadge {
 
@@ -18,6 +20,8 @@ public class VisitorBadge {
     private String companyToVisit;
 
     private String contactPhone;
+
+    private List allowedAreas;
 
     // Getters and Setters
     public String getId() {
@@ -66,5 +70,13 @@ public class VisitorBadge {
 
     public void setContactPhone(String contactPhone) {
         this.contactPhone = contactPhone;
+    }
+
+    public List getAllowedAreas() {
+        return allowedAreas;
+    }
+
+    public void setAllowedAreas(List allowedAreas) {
+        this.allowedAreas = allowedAreas;
     }
 }

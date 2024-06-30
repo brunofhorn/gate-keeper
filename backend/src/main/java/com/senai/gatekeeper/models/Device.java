@@ -4,13 +4,13 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "cameras")
-public class Camera {
+@Document(collection = "devices")
+public class Device {
 
     @Id
     private String id;
 
-    @NotNull(message = "O nome da câmera é obrigatório")
+    @NotNull(message = "O nome do dispositivo é obrigatório")
     private String name;
 
     private String description;
@@ -25,11 +25,11 @@ public class Camera {
         this.id = id;
     }
 
-    public @NotNull(message = "O nome da câmera é obrigatório") String getName() {
+    public @NotNull(message = "O nome do dispositivo é obrigatório") String getName() {
         return name;
     }
 
-    public void setName(@NotNull(message = "O nome da câmera é obrigatório") String name) {
+    public void setName(@NotNull(message = "O nome do dispositivo é obrigatório") String name) {
         this.name = name;
     }
 
