@@ -28,9 +28,20 @@ model User {
 }
 
 model Area {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String
-  company     Company @relation(fields: [companyId], references: [id])
+  company     Company  @relation(fields: [companyId], references: [id])
   companyId   String
+  devices     Device[]
+}
+
+model Device {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  ip          String
+  image       String
+  belongsArea Area   @relation(fields: [areaId], references: [id])
+  areaId      String
 }
