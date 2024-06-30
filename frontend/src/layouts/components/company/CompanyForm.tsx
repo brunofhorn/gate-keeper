@@ -162,11 +162,11 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                         {...register('companyName')}
                         fullWidth
                         label="Razão Social"
-                        placeholder="Digite a razsão social"
+                        placeholder="Digite a razão social"
                         errorMessage={errors.companyName?.message?.toString()}
                         isInvalid={errors.companyName?.message ? true : false}
                         maxLength={60}
-                        autoComplete='off'
+                        defaultValue={editCompany?.companyName ?? ""}
                     />
                 </div>
                 <div className="w-4/12">

@@ -143,8 +143,6 @@ export default function Companies() {
                     </Button>
                 ]}
             />
-
-
         </>
     );
 }

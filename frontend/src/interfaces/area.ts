@@ -21,4 +21,14 @@ export interface AreaListProps {
     setFilteredAreas: (areas: IArea[]) => void;
     onEdit: (areas: IArea) => void;
     onRemove: (areas: IArea) => void;
+    onDetail: (area: IArea) => void;
+}
+
+
+export interface IAreaDetail {
+    id?: string;
+    name?: string;
+    description?: string;
+    companyId?: string;
+    companyTradeName?: string;
 }

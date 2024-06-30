@@ -23,7 +23,7 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
     const [loadingForm, setLoadingForm] = useState<boolean>(false);
     const [loadingCompanies, setLoadingCompanies] = useState<boolean>(true);
     const [companies, setCompanies] = useState<ICompany[]>([]);
-    const { register, handleSubmit, control, clearErrors, reset, formState: { errors, isSubmitSuccessful } } = useForm<AreaFormData>({
+    const { register, handleSubmit, control, clearErrors, reset, setValue, formState: { errors, isSubmitSuccessful } } = useForm<AreaFormData>({
         resolver: zodResolver(areaSchema),
         defaultValues: {
             name: "",
@@ -59,6 +59,8 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
         try {
             if (editArea) {
                 const updatedArea = { ...editArea, ...data };
+
+                console.log("DATA :", data);
 
                 const response = await fetch(`/api/area/${editArea.id}`, {
                     method: 'PUT',
@@ -127,6 +129,16 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
         resetFields();
     };
 
+    useEffect(() => {
+        if (editArea) {
+            setValue("name", editArea.name);
+            setValue("description", editArea.description);
+            setValue("company", editArea.companyId);
+        } else {
+            reset();
+        }
+    }, [editArea, reset]);
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-row gap-2">
@@ -159,7 +171,7 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
                                 errorMessage={errors.company?.message?.toString()}
                                 isInvalid={errors.company?.message ? true : false}
                             >
-                                {(company) => <SelectItem key={company.id}>{company.tradeName}</SelectItem>}
+                                {(company) => <SelectItem key={company.id} value={company.id} textValue={editArea?.companyTradeName ?? company.tradeName}>{company.tradeName}</SelectItem>}
                             </Select>
                         )}
                     />

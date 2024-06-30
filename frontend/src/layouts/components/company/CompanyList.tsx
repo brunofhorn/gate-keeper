@@ -13,7 +13,7 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
         if (columnKey === 'actions') {
             return (
                 <div className="relative flex justify-center gap-2">
-                    <Tooltip content="Detalhes">
+                    <Tooltip content="Visualizar Detalhes">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                             <a onClick={() => onDetail(company)}>
                                 <DynamicIcon icon="FaEye" />

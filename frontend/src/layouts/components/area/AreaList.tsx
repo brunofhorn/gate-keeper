@@ -6,11 +6,18 @@ import { Loading } from "../Loading";
 import { AreaListProps, IArea } from "@/interfaces/area";
 import { columnsArea } from "@/config/areaTable";
 
-export default function AreaList({ loadingAreas, areas, filteredAreas, setFilteredAreas, onEdit, onRemove }: AreaListProps) {
+export default function AreaList({ loadingAreas, areas, filteredAreas, setFilteredAreas, onEdit, onRemove, onDetail }: AreaListProps) {
     const renderCell = useCallback((area: IArea, columnKey: keyof IArea | 'actions') => {
         if (columnKey === 'actions') {
             return (
                 <div className="relative flex justify-center gap-2">
+                    <Tooltip content="Visualizar Detalhes">
+                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                            <a onClick={() => onDetail(area)}>
+                                <DynamicIcon icon="FaEye" />
+                            </a>
+                        </span>
+                    </Tooltip>
                     <Tooltip content="Editar Área">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                             <a onClick={() => onEdit(area)}>
@@ -39,7 +46,7 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
             case "description":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue}</p>
+                        <p className="text-bold text-sm capitalize">{cellValue.slice(0, 99)}{cellValue.length > 99 && "..."}</p>
                     </div>
                 );
             case "companyTradeName":
@@ -119,7 +126,11 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
             >
                 <TableHeader columns={columnsArea}>
                     {(column) => (
-                        <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
+                        <TableColumn
+                            key={column.uid}
+                            align={column.uid === "actions" ? "center" : "start"}
+                            width={column.uid === "description" ? 300 : 100}
+                        >
                             {column.name}
                         </TableColumn>
                     )}
