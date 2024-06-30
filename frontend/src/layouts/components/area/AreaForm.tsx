@@ -23,7 +23,7 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
     const [loadingForm, setLoadingForm] = useState<boolean>(false);
     const [loadingCompanies, setLoadingCompanies] = useState<boolean>(true);
     const [companies, setCompanies] = useState<ICompany[]>([]);
-    const { register, handleSubmit, control, clearErrors, reset, setValue, formState: { errors, isSubmitSuccessful } } = useForm<AreaFormData>({
+    const { handleSubmit, control, clearErrors, reset, setValue, formState: { errors, isSubmitSuccessful } } = useForm<AreaFormData>({
         resolver: zodResolver(areaSchema),
         defaultValues: {
             name: "",
@@ -60,8 +60,6 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
             if (editArea) {
                 const updatedArea = { ...editArea, ...data };
 
-                console.log("DATA :", data);
-
                 const response = await fetch(`/api/area/${editArea.id}`, {
                     method: 'PUT',
                     headers: {
@@ -73,6 +71,8 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
                 if (response.ok) {
                     toast.success("A área foi atualizada com sucesso.");
                     resetFields();
+
+                    const updatedArea = await response.json();
 
                     updateArea(updatedArea);
                     setEditArea(null);
@@ -109,7 +109,7 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
         reset({
             name: "",
             company: "",
-            description: ""
+            description: undefined
         });
         clearErrors();
     };
@@ -137,22 +137,27 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
         } else {
             reset();
         }
-    }, [editArea, reset]);
+    }, [editArea, reset, setValue]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-row gap-2">
                 <div className="w-6/12">
-                    <Input
-                        {...register('name')}
-                        fullWidth
-                        label="Nome"
-                        placeholder="Digite o nome da área"
-                        errorMessage={errors.name?.message?.toString()}
-                        isInvalid={errors.name?.message ? true : false}
-                        maxLength={30}
-                        autoComplete="off"
+                    <Controller
+                        name={"name"}
+                        control={control}
                         defaultValue={undefined}
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                fullWidth
+                                label="Nome"
+                                placeholder="Digite o nome da área"
+                                errorMessage={errors.name?.message?.toString()}
+                                isInvalid={errors.name?.message ? true : false}
+                                maxLength={30}
+                            />
+                        )}
                     />
                 </div>
                 <div className="w-6/12">
@@ -160,16 +165,23 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
                         name={"company"}
                         control={control}
                         defaultValue={undefined}
-                        render={({ field: { onChange, value } }) => (
+                        render={({ field }) => (
                             <Select
+                                {...field}
                                 isLoading={loadingCompanies}
-                                value={value}
-                                onChange={onChange}
                                 items={companies}
                                 label="Empresa"
                                 placeholder="Selecione a empresa"
                                 errorMessage={errors.company?.message?.toString()}
                                 isInvalid={errors.company?.message ? true : false}
+                                selectedKeys={field.value ? [field.value] : undefined}
+                                renderValue={(items) => {
+                                    return items.map((item) => (
+                                        <div key={item.key}>
+                                            {item.textValue}
+                                        </div>
+                                    ));
+                                }}
                             >
                                 {(company) => <SelectItem key={company.id} value={company.id} textValue={editArea?.companyTradeName ?? company.tradeName}>{company.tradeName}</SelectItem>}
                             </Select>
@@ -180,14 +192,21 @@ const AreaForm = ({ addArea, editArea, setEditArea, updateArea }: AreaFormProps)
             <Spacer y={2} />
             <div className="flex flex-row gap-2">
                 <div className="w-full">
-                    <Textarea
-                        {...register('description')}
-                        fullWidth
-                        label="Descrição"
-                        placeholder="Digite a descrição da sala"
-                        errorMessage={errors.description?.message?.toString()}
-                        isInvalid={errors.description?.message ? true : false}
-                        maxLength={200}
+                    <Controller
+                        name={"description"}
+                        control={control}
+                        defaultValue={undefined}
+                        render={({ field }) => (
+                            <Textarea
+                                {...field}
+                                fullWidth
+                                label="Descrição"
+                                placeholder="Digite a descrição da área"
+                                errorMessage={errors.description?.message?.toString()}
+                                isInvalid={errors.description?.message ? true : false}
+                                maxLength={200}
+                            />
+                        )}
                     />
                 </div>
             </div>

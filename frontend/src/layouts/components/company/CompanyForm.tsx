@@ -158,27 +158,41 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                     />
                 </div>
                 <div className="w-5/12">
-                    <Input
-                        {...register('companyName')}
-                        fullWidth
-                        label="Razão Social"
-                        placeholder="Digite a razão social"
-                        errorMessage={errors.companyName?.message?.toString()}
-                        isInvalid={errors.companyName?.message ? true : false}
-                        maxLength={60}
-                        defaultValue={editCompany?.companyName ?? ""}
+                    <Controller
+                        name={"companyName"}
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                fullWidth
+                                label="Razão Social"
+                                placeholder="Digite a razão social"
+                                errorMessage={errors.companyName?.message?.toString()}
+                                isInvalid={errors.companyName?.message ? true : false}
+                                maxLength={60}
+                                defaultValue={editCompany?.companyName ?? ""}
+                            />
+                        )}
                     />
                 </div>
                 <div className="w-4/12">
-                    <Input
-                        {...register('tradeName')}
-                        fullWidth
-                        label="Nome fantasia"
-                        placeholder="Digite o nome fantasia"
-                        errorMessage={errors.tradeName?.message?.toString()}
-                        isInvalid={errors.tradeName?.message ? true : false}
-                        maxLength={70}
-                        autoComplete='off'
+                    <Controller
+                        name={"tradeName"}
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                fullWidth
+                                label="Nome fantasia"
+                                placeholder="Digite o nome fantasia"
+                                errorMessage={errors.tradeName?.message?.toString()}
+                                isInvalid={errors.tradeName?.message ? true : false}
+                                maxLength={70}
+                                autoComplete='off'
+                            />
+                        )}
                     />
                 </div>
             </div>
@@ -214,7 +228,7 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                                 onChange={(e) => onChange(maskNumbers(e.target.value))}
                                 fullWidth
                                 label="Andar"
-                                placeholder="Digite o floor"
+                                placeholder="Digite o andar"
                                 errorMessage={errors.floor?.message?.toString()}
                                 isInvalid={errors.floor?.message ? true : false}
                                 maxLength={3}
@@ -223,14 +237,21 @@ const CompanyForm = ({ addCompany, editCompany, setEditCompany, updateCompany }:
                     />
                 </div>
                 <div className="w-1/3">
-                    <Input
-                        {...register('room')}
-                        fullWidth
-                        label="Sala"
-                        placeholder="Digite a sala"
-                        errorMessage={errors.room?.message?.toString()}
-                        isInvalid={errors.room?.message ? true : false}
-                        maxLength={6}
+                    <Controller
+                        name={"room"}
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                fullWidth
+                                label="Sala"
+                                placeholder="Digite a sala"
+                                errorMessage={errors.room?.message?.toString()}
+                                isInvalid={errors.room?.message ? true : false}
+                                maxLength={6}
+                            />
+                        )}
                     />
                 </div>
             </div>
