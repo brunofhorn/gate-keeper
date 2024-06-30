@@ -1,9 +1,12 @@
+import { ICompany } from "./company";
+
 export interface IArea {
     id: string;
     name: string;
     description: string;
     companyId: string;
     companyTradeName: string;
+    company?: ICompany;
 }
 
 

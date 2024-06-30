@@ -3,31 +3,31 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Pagination, Input } from "@nextui-org/react";
 import DynamicIcon from "../../helpers/DynamicIcon";
 import { Loading } from "../Loading";
-import { AreaListProps, IArea } from "@/interfaces/area";
-import { columnsArea } from "@/config/areaTable";
+import { DeviceListProps, IDevice } from "@/interfaces/device";
+import { columnsDevice } from "@/config/deviceTable";
 
-export default function AreaList({ loadingAreas, areas, filteredAreas, setFilteredAreas, onEdit, onRemove, onDetail }: AreaListProps) {
-    const renderCell = useCallback((area: IArea, columnKey: keyof IArea | 'actions') => {
+export default function DeviceList({ loadingDevices, devices, filteredDevices, setFilteredDevices, onEdit, onRemove, onDetail }: DeviceListProps) {
+    const renderCell = useCallback((device: IDevice, columnKey: keyof IDevice | 'actions') => {
         if (columnKey === 'actions') {
             return (
                 <div className="relative flex justify-center gap-2">
                     <Tooltip content="Visualizar Detalhes">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <a onClick={() => onDetail(area)}>
+                            <a onClick={() => onDetail(device)}>
                                 <DynamicIcon icon="FaEye" />
                             </a>
                         </span>
                     </Tooltip>
-                    <Tooltip content="Editar Área">
+                    <Tooltip content="Editar Dispositivo">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <a onClick={() => onEdit(area)}>
+                            <a onClick={() => onEdit(device)}>
                                 <DynamicIcon icon="FaPencil" />
                             </a>
                         </span>
                     </Tooltip>
-                    <Tooltip color="danger" content="Deletar Área">
+                    <Tooltip color="danger" content="Deletar Dispositivo">
                         <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                            <a onClick={() => onRemove(area)}>
+                            <a onClick={() => onRemove(device)}>
                                 <DynamicIcon icon="FaTrash" />
                             </a>
                         </span>
@@ -36,12 +36,15 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
             );
         }
 
-        const cellValue = area[columnKey] as string;
+        const cellValue = device[columnKey] as string;
 
         switch (columnKey) {
             case "name":
                 return (
-                    <p className="text-bold text-sm">{cellValue}</p>
+                    <div className="flex flex-col">
+                        <p className="text-bold text-sm">{cellValue}</p>
+                        <p className="text-bold text-sm text-default-400">{device.ip}</p>
+                    </div>
                 );
             case "description":
                 return (
@@ -49,10 +52,11 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
                         <p className="text-bold text-sm">{cellValue.slice(0, 99)}{cellValue.length > 99 && "..."}</p>
                     </div>
                 );
-            case "companyTradeName":
+            case "belongsArea":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm">{cellValue}</p>
+                        <p className="text-bold text-sm">{device.belongsArea.company?.tradeName}</p>
+                        <p className="text-bold text-sm text-default-400">{device.belongsArea.name}</p>
                     </div>
                 );
             default:
@@ -65,13 +69,13 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
     const [search, setSearch] = useState('');
 
     useEffect(() => {
-        setFilteredAreas(
-            areas.filter(area =>
-                area.name.toLowerCase().includes(search.toLowerCase())
+        setFilteredDevices(
+            devices.filter(device =>
+                device.name.toLowerCase().includes(search.toLowerCase())
             )
         );
         setCurrentPage(1);
-    }, [search, areas]);
+    }, [search, devices]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -83,7 +87,7 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredAreas.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredDevices.slice(indexOfFirstItem, indexOfLastItem);
 
     const onClear = useCallback(() => {
         setSearch("");
@@ -93,15 +97,15 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
     return (
         <>
             <Table
-                aria-label="Tabela de Áreas"
+                aria-label="Tabela de Dispositivos"
                 isStriped
                 bottomContent={
-                    !loadingAreas && (
+                    !loadingDevices && (
                         <div className="flex w-full justify-center">
                             <Pagination
                                 isCompact
                                 showShadow
-                                total={Math.ceil(filteredAreas.length / itemsPerPage)}
+                                total={Math.ceil(filteredDevices.length / itemsPerPage)}
                                 initialPage={1}
                                 onChange={(page) => handlePageChange(page)}
                             />
@@ -124,7 +128,7 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
                     </div>
                 }
             >
-                <TableHeader columns={columnsArea}>
+                <TableHeader columns={columnsDevice}>
                     {(column) => (
                         <TableColumn
                             key={column.uid}
@@ -135,10 +139,10 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={currentItems} isLoading={loadingAreas} loadingContent={<Loading />}>
+                <TableBody items={currentItems} isLoading={loadingDevices} loadingContent={<Loading />}>
                     {(item) => (
                         <TableRow key={item.id}>
-                            {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IArea)}</TableCell>}
+                            {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IDevice)}</TableCell>}
                         </TableRow>
                     )}
                 </TableBody>

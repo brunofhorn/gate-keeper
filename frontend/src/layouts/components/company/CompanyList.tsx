@@ -44,14 +44,14 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
             case "companyName":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue}</p>
-                        <p className="text-bold text-sm capitalize text-default-400">{company.tradeName}</p>
+                        <p className="text-bold text-sm">{cellValue}</p>
+                        <p className="text-bold text-sm text-default-400">{company.tradeName}</p>
                     </div>
                 );
             case "cnpj":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{maskCnpj(cellValue)}</p>
+                        <p className="text-bold text-sm">{maskCnpj(cellValue)}</p>
                     </div>
                 );
             case "phone":
@@ -63,7 +63,7 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
             case "floor":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue} {company?.floor && `/ ${company.room}`}</p>
+                        <p className="text-bold text-sm">{cellValue} {company?.floor && `/ ${company.room}`}</p>
                     </div>
                 );
             default:
