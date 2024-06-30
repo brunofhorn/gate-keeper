@@ -5,7 +5,7 @@ import DynamicIcon from "../../helpers/DynamicIcon";
 import { Loading } from "../Loading";
 import { EmployeeListProps, IEmployee } from "@/interfaces/employee";
 import { maskCpf } from "@/service/functions/maskCpf";
-import { columnsEmployee } from "@/config/employeeTable";
+import { columnsEmployee } from "@/config/columnsTable";
 
 export default function EmployeeList({ loadingEmployees, employees, filteredEmployees, setFilteredEmployees, onEdit, onRemove, onDetail }: EmployeeListProps) {
     const renderCell = useCallback((employee: IEmployee, columnKey: keyof IEmployee | 'actions') => {

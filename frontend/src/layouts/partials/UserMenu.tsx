@@ -21,13 +21,11 @@ const UserMenu = () => {
                 <DropdownTrigger>
                     <Avatar isBordered as="button" className="transition-transform" size="sm" color="primary" showFallback name='Jane' src="https://i.pravatar.cc/150?u=a04258a2462d826712d" />
                 </DropdownTrigger>
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                <DropdownMenu aria-label="Ações do Perfil" variant="flat">
                     <DropdownItem key="profile" className="h-14 gap-2">
                         <p className="font-semibold">Logado como</p>
                         <p className="font-semibold">{user ? user.email : 'Carregando...'}</p>
                     </DropdownItem>
-                    <DropdownItem key="settings">Meu perfil</DropdownItem>
-                    <DropdownItem key="configurations">Configurações</DropdownItem>
                     <DropdownItem key="logout" color="danger">Sair</DropdownItem>
                 </DropdownMenu>
             </Dropdown>
