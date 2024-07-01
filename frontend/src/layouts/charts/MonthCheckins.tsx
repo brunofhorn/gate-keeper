@@ -6,17 +6,17 @@ import { VictoryChart, VictoryArea, VictoryTheme } from 'victory';
 const data = [
     { x: 1, y: 2 },
     { x: 2, y: 3 },
-    { x: 3, y: 5 },
+    { x: 3, y: 3 },
     { x: 4, y: 4 },
     { x: 5, y: 6 },
 ];
 
 const data2 = [
+    { x: 1, y: 1 },
+    { x: 2, y: 3 },
+    { x: 3, y: 2 },
+    { x: 4, y: 3 },
     { x: 5, y: 1 },
-    { x: 3, y: 6 },
-    { x: 7, y: 5 },
-    { x: 3, y: 3 },
-    { x: 2, y: 2 },
 ];
 
 const MonthCheckins = () => (
@@ -24,7 +24,7 @@ const MonthCheckins = () => (
         <VictoryArea
             data={data}
             style={{
-                data: { stroke: "#c43a31" },
+                data: { stroke: "#7C0ED9" },
                 parent: { border: "1px solid #ccc" }
             }}
         />

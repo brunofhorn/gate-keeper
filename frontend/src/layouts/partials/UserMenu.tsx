@@ -4,9 +4,11 @@ import { IUser } from "@/interfaces/user";
 import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import Cookies from 'js-cookie';
+import { useRouter } from "next/navigation";
 
 const UserMenu = () => {
     const [user, setUser] = useState<IUser | null>(null);
+    const { push } = useRouter();
 
     useEffect(() => {
         const userData = Cookies.get('gateKeeperUserData');
@@ -14,6 +16,11 @@ const UserMenu = () => {
             setUser(JSON.parse(userData));
         }
     }, []);
+
+    const handleLogout = () => {
+        Cookies.remove('gateKeeperUserData');
+        push("/");
+    };
 
     return (
         <>
@@ -26,7 +33,7 @@ const UserMenu = () => {
                         <p className="font-semibold">Logado como</p>
                         <p className="font-semibold">{user ? user.email : 'Carregando...'}</p>
                     </DropdownItem>
-                    <DropdownItem key="logout" color="danger">Sair</DropdownItem>
+                    <DropdownItem key="logout" color="danger" onClick={handleLogout}>Sair</DropdownItem>
                 </DropdownMenu>
             </Dropdown>
         </>

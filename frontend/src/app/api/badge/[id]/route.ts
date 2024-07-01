@@ -9,15 +9,18 @@ export async function GET(request: Request, { params }: { params: { id: string; 
     try {
         const badge = await prisma.badge.findFirst({
             where: {
-                code: badgeId
+                code: badgeId,
             }
         });
 
         if (!badge) {
             return NextResponse.json({ status: 200, statusText: "Crachá disponível para cadastro." });
         } else {
-            return NextResponse.json(badge, { status: 202, statusText: "O crachá já está cadastrado." });
-
+            if (badge.active) {
+                return NextResponse.json(badge, { status: 202, statusText: "O crachá já está cadastrado." });
+            } else {
+                return NextResponse.json({ status: 200, statusText: "Crachá disponível para cadastro." });
+            }
         }
     } catch (error) {
         return NextResponse.json(error, { status: 500, statusText: "Erro ao buscar o crachá." });
@@ -32,6 +35,26 @@ export async function PUT(request: Request, { params }: { params: { id: string; 
             data: {
                 active: false,
                 updatedAt: new Date()
+            },
+            include: {
+                employee: {
+                    include: {
+                        company: true,
+                    }
+                },
+                permissions: {
+                    include: {
+                        area: true,
+                        badge: true
+                    }
+                },
+                visit: {
+                    include: {
+                        badge: true,
+                        responsibleForTheVisit: true,
+                        visitor: true
+                    }
+                }
             },
             where: { id: badgeId },
         });

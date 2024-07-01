@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     try {
         const badgeExist = await prisma.badge.findFirst({
             where: {
-                code: data.code
+                code: data.code,
             }
         });
 
