@@ -35,10 +35,20 @@ const columnsVisitor = [
     { name: "Ações", uid: "actions" },
 ];
 
+const columnsBadge = [
+    { name: "Code", uid: "code" },
+    { name: "Nome", uid: "employee" },
+    { name: "Tipo", uid: "type" },
+    { name: "Validade", uid: "visit" },
+    { name: "Status", uid: "active" },
+    { name: "Ações", uid: "actions" },
+];
+
 export {
     columnsArea,
     columnsCompany,
     columnsDevice,
     columnsEmployee,
-    columnsVisitor
+    columnsVisitor,
+    columnsBadge
 };

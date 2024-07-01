@@ -15,40 +15,49 @@ model Company {
   phone       String
   floor       String?
   room        String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now())
   areas       Area[]
   employees   Employee[]
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  username String @unique
-  name     String
-  cpf      String
-  password String
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  name      String
+  cpf       String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 model Area {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  companyId   String
-  devices     Device[]
-  company     Company  @relation(fields: [companyId], references: [id])
+  id            String       @id @default(uuid())
+  name          String
+  description   String
+  companyId     String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now())
+  devices       Device[]
+  company       Company      @relation(fields: [companyId], references: [id])
+  allowedBageds Permission[]
 }
 
 model Device {
-  id          String @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String
   ip          String
   image       String
   areaId      String
-  belongsArea Area   @relation(fields: [areaId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  belongsArea Area     @relation(fields: [areaId], references: [id])
 }
 
 model Employee {
-  id         String  @id @default(uuid())
+  id         String   @id @default(uuid())
   name       String
   mobile     String
   email      String
@@ -57,19 +66,59 @@ model Employee {
   avatar     String
   role       String
   department String
-  company    Company @relation(fields: [companyId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  company    Company  @relation(fields: [companyId], references: [id])
   companyId  String
+  badges     Badge[]
+  visits     Visit[]
 }
 
 model Visitor {
-  id     String @id @default(uuid())
-  name   String
-  cpf    String @unique
-  mobile String
+  id        String   @id @default(uuid())
+  name      String
+  cpf       String   @unique
+  mobile    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  visits    Visit[]
 }
 
-// visitInitialDate       String
-//   visitEndDate           String
-//   observations           String
-//   employeeId             String
-//   responsibleForTheVisit Employee @relation(fields: [employeeId], references: [id])
+model Badge {
+  id          String       @id @default(uuid())
+  code        String       @unique
+  type        BadgeType
+  employeeId  String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now())
+  active      Boolean      @default(true)
+  employee    Employee     @relation(fields: [employeeId], references: [id])
+  visit       Visit[]
+  permissions Permission[]
+}
+
+model Visit {
+  id                       String   @id @default(uuid())
+  visitorId                String
+  responsibleForTheVisitId String
+  startDate                String
+  endDate                  String
+  observations             String
+  badgeId                  String?
+  badge                    Badge?   @relation(fields: [badgeId], references: [id])
+  responsibleForTheVisit   Employee @relation(fields: [responsibleForTheVisitId], references: [id])
+  visitor                  Visitor  @relation(fields: [visitorId], references: [id])
+}
+
+model Permission {
+  id      String @id @default(uuid())
+  areaId  String
+  badgeId String
+  area    Area   @relation(fields: [areaId], references: [id])
+  badge   Badge  @relation(fields: [badgeId], references: [id])
+}
+
+enum BadgeType {
+  FIXED
+  TEMPORARY
+}

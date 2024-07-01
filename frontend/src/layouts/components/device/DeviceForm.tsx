@@ -2,14 +2,13 @@
 
 import DynamicIcon from "@/layouts/helpers/DynamicIcon";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Chip, Input, Select, SelectItem, SelectSection, Spacer, Textarea } from "@nextui-org/react";
+import { Button, Input, Select, SelectItem, SelectSection, Spacer, Textarea } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Loading } from "../Loading";
-import { ICompany } from "@/interfaces/company";
 import { toast } from "react-toastify";
-import { DeviceFormProps, IDevice } from "@/interfaces/device";
+import { DeviceFormProps } from "@/interfaces/device";
 import { IArea } from "@/interfaces/area";
 
 const deviceSchema = z.object({
