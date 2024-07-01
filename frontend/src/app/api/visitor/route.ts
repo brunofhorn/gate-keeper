@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         });
 
         if (!visitorExist) {
-            const employee = await prisma.visitor.create({
+            const visitor = await prisma.visitor.create({
                 data: {
                     name: data.name,
                     cpf: data.cpf,
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
                 },
             });
 
-            return NextResponse.json(employee, { status: 201, statusText: "Visitante criado." });
+            return NextResponse.json(visitor, { status: 201, statusText: "Visitante criado." });
         } else {
             return NextResponse.json(visitorExist, { status: 200, statusText: "Visitante já existe." });
         }
