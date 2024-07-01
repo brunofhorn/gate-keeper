@@ -142,7 +142,7 @@ export default function CompanyList({ loadingCompanies, companies, filteredCompa
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={currentItems} isLoading={loadingCompanies} loadingContent={<Loading />}>
+                <TableBody items={currentItems} isLoading={loadingCompanies} loadingContent={<Loading />} emptyContent="Nenhuma empresa cadastrada">
                     {(item) => (
                         <TableRow key={item.id}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof ICompany)}</TableCell>}
