@@ -139,7 +139,7 @@ export default function DeviceList({ loadingDevices, devices, filteredDevices, s
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={currentItems} isLoading={loadingDevices} loadingContent={<Loading />}>
+                <TableBody items={currentItems} isLoading={loadingDevices} loadingContent={<Loading />} emptyContent="Nenhum dispositivo cadastrado">
                     {(item) => (
                         <TableRow key={item.id}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IDevice)}</TableCell>}

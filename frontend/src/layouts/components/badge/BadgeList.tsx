@@ -164,7 +164,7 @@ export default function BadgeList({ loadingBadges, badges, filteredBadges, setFi
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={currentItems} isLoading={loadingBadges} loadingContent={<Loading />}>
+                <TableBody items={currentItems} isLoading={loadingBadges} loadingContent={<Loading />} emptyContent="Nenhum crachá cadastrado">
                     {(item) => (
                         <TableRow key={item.id}>
                             {(columnKey) => <TableCell width={columnKey === "code" ? 10 : columnKey === "name" ? 300 : 100}>{renderCell(item, columnKey as keyof IBadge)}</TableCell>}

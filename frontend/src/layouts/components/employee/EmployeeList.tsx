@@ -149,7 +149,7 @@ export default function EmployeeList({ loadingEmployees, employees, filteredEmpl
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={currentItems} isLoading={loadingEmployees} loadingContent={<Loading />}>
+                <TableBody items={currentItems} isLoading={loadingEmployees} loadingContent={<Loading />} emptyContent="Nenhum funcionário cadastrado">
                     {(item) => (
                         <TableRow key={item.id}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IEmployee)}</TableCell>}

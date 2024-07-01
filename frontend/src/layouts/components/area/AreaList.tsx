@@ -135,7 +135,7 @@ export default function AreaList({ loadingAreas, areas, filteredAreas, setFilter
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={currentItems} isLoading={loadingAreas} loadingContent={<Loading />}>
+                <TableBody items={currentItems} isLoading={loadingAreas} loadingContent={<Loading />} emptyContent="Nenhuma área cadastrada">
                     {(item) => (
                         <TableRow key={item.id}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey as keyof IArea)}</TableCell>}
