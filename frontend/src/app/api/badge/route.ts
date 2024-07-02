@@ -69,6 +69,21 @@ export async function POST(request: Request) {
                                 }
                             })),
                         },
+                    },
+                    include: {
+                        employee: {
+                            include: {
+                                company: true,
+                            }
+                        },
+                        permissions: true,
+                        visit: {
+                            include: {
+                                visitor: true,
+                                responsibleForTheVisit: true,
+                                badge: true
+                            }
+                        }
                     }
                 });
 
@@ -107,6 +122,21 @@ export async function POST(request: Request) {
                                 observations: data?.observations ?? "",
                             },
                         },
+                    },
+                    include: {
+                        employee: {
+                            include: {
+                                company: true,
+                            }
+                        },
+                        permissions: true,
+                        visit: {
+                            include: {
+                                visitor: true,
+                                responsibleForTheVisit: true,
+                                badge: true
+                            }
+                        }
                     }
                 });
 
